@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,30 +15,35 @@ public class ProductDAO implements DAO{
     private static final Logger log = LoggerFactory.getLogger(ProductDAO.class);
 
     public ProductDAO (DataSource dataSource) {
-        log.info("JDBCTEMPLATE CREATED SUCCESSFULLY");
         jdbcTemplate = new JdbcTemplate(dataSource);
+        log.debug("JDBCTemplate was created");
     }
 
+    @Override
     public JSONArray readAll() {
-        log.info("Querying for customer records:");
         List<ProductModel> response = jdbcTemplate.query(
                 "SELECT id, name, views FROM products",
-                (rs, rowNum) -> new ProductModel(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getLong("views")
-                )
+                (res, rowNum) -> new ProductModel(res)
         ).stream().collect(Collectors.toList());
+        log.debug("the response for readAll was created");
         return new JSONArray(response);
     }
 
     @Override
     public JSONArray readByID(Long id) {
-        return null;
+        List<ProductModel> response = jdbcTemplate.query(
+                "SELECT id, name, views FROM products WHERE id = ?", new Object[]{id},
+                (res, rowNum) -> new ProductModel(res)
+        ).stream().collect(Collectors.toList());
+        log.debug("the response for readByID was created");
+        return new JSONArray(Arrays.asList(response));
     }
 
     @Override
-    public JSONArray updateByID(Long id) {
-        return null;
+    public JSONArray updateByID(Long id, String name, Long views) {
+        jdbcTemplate.update("UPDATE products SET name = ?, views = ? WHERE id = ?", name, views, id);
+        return new JSONArray("[200, OK]");
     }
+
+
 }
