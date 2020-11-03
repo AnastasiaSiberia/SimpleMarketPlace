@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/uwplp")
 public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
-    private static final ProductDAO productDAO;
+    private static ProductDAO productDAO;
 
     public ProductController() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class);
