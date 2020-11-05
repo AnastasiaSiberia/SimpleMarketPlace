@@ -1,18 +1,22 @@
 package com.uwplp.components;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.swing.tree.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import static java.util.Objects.hash;
 
 @Entity
 public class ProductModel{
     private @Id @GeneratedValue Long id;
+    private static final Logger log = LoggerFactory.getLogger(ProductModel.class);
 
     private String name;
     private Long views;
@@ -28,6 +32,14 @@ public class ProductModel{
         this.id = id;
         this.name = name;
         this.views = views;
+    }
+
+    public ProductModel(String string) {
+        String[] splitted = string.split(",");
+        log.debug(Arrays.toString(splitted));
+        this.id = Long.valueOf(splitted[0]);
+        this.name = splitted[1];
+        this.views = 0L;
     }
 
     public ProductModel(ResultSet rs) throws SQLException {
@@ -58,6 +70,9 @@ public class ProductModel{
 
     public void setViews(Long views) {
         this.views = views;
+    }
+    public void addView() {
+        this.views++;
     }
 
     @Override
