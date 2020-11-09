@@ -50,7 +50,7 @@ public class ProductDAO implements DAO{
         else {
             log.warn("readByID didn't find a product with id = {}", id);
         }
-        return new JSONArray(Arrays.asList(response));
+        return new JSONArray(response);
     }
 
     @Override
@@ -107,7 +107,8 @@ public class ProductDAO implements DAO{
         return new JSONArray(statistic);
     }
 
-    public void deleteAll() {
+    public JSONArray deleteAll() {
         jdbcTemplate.update("DELETE FROM products");
+        return new JSONArray("[200, OK]");
     }
 }
