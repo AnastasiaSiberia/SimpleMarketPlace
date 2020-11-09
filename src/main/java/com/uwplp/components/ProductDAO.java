@@ -22,8 +22,8 @@ public class ProductDAO implements DAO{
         jdbcTemplate = new JdbcTemplate(dataSource);
         log.debug("JDBCTemplate was created");
         executorService = new ThreadPoolExecutor(
-                2, 4, 60000L,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+                2, 4, 5L,
+                TimeUnit.SECONDS, new LinkedBlockingQueue<>());
     }
 
     @Override
@@ -74,30 +74,27 @@ public class ProductDAO implements DAO{
     }
 
     public JSONArray updateFew(String csvFile) {
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                log.debug("new Runnable was added into queue");
-                List <ProductModel> products = Arrays.stream(csvFile.split("\n")).skip(1).sorted().
-                        map(ProductModel::new).collect(Collectors.toList());
-                log.debug("product was splitted");
-                List <ProductModel> for_update = products.stream().filter(
-                        (x) -> (jdbcTemplate.query(
-                                "SELECT id, name, views FROM products WHERE id = ?", new Object[]{x.getId()},
-                                (res, rowNum) -> new ProductModel(res)
-                        ).size() == 1)
-                ).collect(Collectors.toList());
-                log.debug("queue for updating : " + for_update);
+        executorService.execute(() -> {
+            log.debug("new Runnable was added into queue");
+            List <ProductModel> products = Arrays.stream(csvFile.split("\n")).skip(1).sorted().
+                    map(ProductModel::new).collect(Collectors.toList());
+            log.debug("product was splitted");
+            List <ProductModel> for_update = products.stream().filter(
+                    (x) -> (jdbcTemplate.query(
+                            "SELECT id, name, views FROM products WHERE id = ?", new Object[]{x.getId()},
+                            (res, rowNum) -> new ProductModel(res)
+                    ).size() == 1)
+            ).collect(Collectors.toList());
+            log.debug("queue for updating : " + for_update);
 
-                List <ProductModel> for_adding = products.stream().filter(
-                        (x) -> (jdbcTemplate.query(
-                                "SELECT id, name, views FROM products WHERE id = ?", new Object[]{x.getId()},
-                                (res, rowNum) -> new ProductModel(res)
-                        ).size() == 0)
-                ).collect(Collectors.toList());
-                log.debug("queue for adding : " + for_adding);
-                updateTransaction(for_update, for_adding);
-            }
+            List <ProductModel> for_adding = products.stream().filter(
+                    (x) -> (jdbcTemplate.query(
+                            "SELECT id, name, views FROM products WHERE id = ?", new Object[]{x.getId()},
+                            (res, rowNum) -> new ProductModel(res)
+                    ).size() == 0)
+            ).collect(Collectors.toList());
+            log.debug("queue for adding : " + for_adding);
+            updateTransaction(for_update, for_adding);
         });
         return new JSONArray("[200, OK]");
     }
@@ -108,5 +105,9 @@ public class ProductDAO implements DAO{
                 (rs, rowNum) -> new ProductModel(rs)
                 );
         return new JSONArray(statistic);
+    }
+
+    public void deleteAll() {
+        jdbcTemplate.update("DELETE FROM products");
     }
 }

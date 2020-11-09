@@ -1,13 +1,97 @@
 package com.uwplp.uwplp;
 
-import org.junit.jupiter.api.Test;
+import com.uwplp.components.ProductDAO;
+import org.aspectj.lang.annotation.After;
+import org.json.JSONArray;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.ResourceUtils;
 
-@SpringBootTest
+import javax.sql.DataSource;
+import java.io.File;
+import java.nio.file.Files;
+
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UwplpApplicationTests {
+    @Autowired
+    private TestRestTemplate restTemplate;
+    private static final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(com.uwplp.uwplp.ApplicationContext.class);
+    private static final ProductDAO productDAO = (ProductDAO) context.getBean("productDAO");
+    private static final Logger log = LoggerFactory.getLogger(UwplpApplicationTests.class);
 
-    @Test
-    void contextLoads() {
+    public UwplpApplicationTests() {
+        log.info("#########################TESTING####################################");
     }
 
+    @Nested
+    class ContextLoads {
+        @Test
+        void contextLoads() {
+            Assertions.assertNotNull(context);
+        }
+        @Test
+        void dataSourceLoads() {
+            DataSource dataSource = (DataSource)context.getBean("dataSource");
+            Assertions.assertNotNull(dataSource);
+        }
+        @Test
+        void daoLoads() {
+            ProductDAO productDAO = (ProductDAO) context.getBean("productDAO");
+            Assertions.assertNotNull(productDAO);
+        }
+    }
+    @Nested
+    class TestingDAOMock {
+        ProductDAO productDAO = Mockito.mock(ProductDAO.class);
+
+        TestingDAOMock() {
+            Mockito.when(productDAO.updateByID(1L, "lipstick", 3L)).thenReturn(new JSONArray("[200, OK]"));
+        }
+
+        @Test
+        void updateByID() {
+            JSONArray result = productDAO.updateByID(1L, "lipstick", 3L);
+            Assertions.assertEquals("[200,\"OK\"]", result.toString());
+        }
+
+    }
+
+    @BeforeAll
+    public static void fillDb() throws Exception {
+        File file = ResourceUtils.getFile("classpath:test.csv");
+        String csvString = new String(Files.readAllBytes(file.toPath()));
+        productDAO.updateFew(csvString);
+    }
+
+    @Test
+    public void readAll() {
+        JSONArray jsonArray = productDAO.readAll();
+        Assertions.assertEquals("[{\"name\":\"shoes\",\"id\":1,\"views\":0},{\"name\":\"boots\",\"id\":2,\"views\":0},{\"name\":\"blouse\",\"id\":3,\"views\":0},{\"name\":\"skirt\",\"id\":4,\"views\":0},{\"name\":\"lipstick\",\"id\":5,\"views\":0}]",jsonArray.toString());
+    }
+
+    @Test
+    public void updateFew() throws Exception {
+        File file = ResourceUtils.getFile("classpath:test2.csv");
+        String csvString = new String(Files.readAllBytes(file.toPath()));
+        productDAO.updateFew(csvString);
+        Thread.sleep(1000);
+        JSONArray jsonArray = productDAO.readAll();
+        Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":0},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":0},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":0},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":0},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0}]"
+                ,jsonArray.toString());
+    }
+
+    @AfterAll
+    public static void resetDb() {
+        productDAO.deleteAll();
+    }
+    
 }

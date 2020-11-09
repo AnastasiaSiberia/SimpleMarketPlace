@@ -8,12 +8,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("com.uwplp.components")
 public class ApplicationContext {
     private static final Logger log = LoggerFactory.getLogger(ApplicationContext.class);
+
+    @PostConstruct
+    public void Init() {
+        log.info("####################################APLICATIONCONTEXTRESTART##############################################");
+    }
+
     @Bean
     public DataSource dataSource() {
         log.info("dataSource is CREATING");
