@@ -17,6 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ResourceUtils;
@@ -36,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class IntegrationTests {
 
     @Autowired
@@ -53,7 +59,9 @@ class IntegrationTests {
         log.info("#########################INTEGRATION_TESTING####################################");
     }
 
+
     @Test
+    @Order(1)
     public void readByIdOnlyWeb() throws Exception {
         mockMvc.perform(get("/uwplp/3")).andExpect(status().isOk())
                 .andExpect(content().string(containsString("[{\"name\":\"blouse\",\"id\":3,\"views\":1}]")));
@@ -77,12 +85,14 @@ class IntegrationTests {
     }
 
     @Test
+    @Order(1)
     public void readById() {
         String result = new String(restTemplate.getForObject("http://localhost:" + port + "uwplp/1", String.class).getBytes(), StandardCharsets.UTF_8);
         log.debug("readById give " + result);
         Assertions.assertEquals("[{\"name\":\"shoes\",\"id\":1,\"views\":1}]", result);
     }
     @Test
+    @Order(2)
     public void updateById() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -93,24 +103,21 @@ class IntegrationTests {
         String result = new String(restTemplate.getForObject("http://localhost:" + port + "uwplp/4", String.class).getBytes(), StandardCharsets.UTF_8);
         Assertions.assertEquals("[{\"name\":\"skirt MUSA\",\"id\":4,\"views\":1}]", result);
     }
-    /*
+
     @Test
-    public void updateFew() throws IOException {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    @Order(3)
+    public void updateFew() throws Exception {
+        ResultMatcher ok = MockMvcResultMatchers.status().isOk();
         File file = ResourceUtils.getFile("classpath:test2.csv");
-        MultipartFile multipartFile = new MockMultipartFile("test2.csv",
-                "test2.csv",
-                "text/plain",
-                Files.readAllBytes(file.toPath()));
-        MultiValueMap<String, MultipartFile> map = new LinkedMultiValueMap<>();
-        map.add("csvFile", multipartFile);
-        HttpEntity<MultiValueMap<String, MultipartFile> > request = new HttpEntity<>(map, httpHeaders);
-        restTemplate.postForObject("http://localhost:" + port + "uwplp/", request, String.class);
+        MockHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart("/uwplp/").file("csvFile", Files.readAllBytes(file.toPath()));
+        this.mockMvc.perform(builder).andExpect(ok)
+                .andDo(MockMvcResultHandlers.print());
         String result = new String(restTemplate.getForObject("http://localhost:" + port + "uwplp/", String.class).getBytes(), StandardCharsets.UTF_8);
         log.debug("updateFew " + result);
-        Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":0},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":0},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":0},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":0},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0},{\"name\":\"new shirt EXCLUSIVE\",\"id\":6,\"views\":0}]", result);
-    }*/
+        Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":1},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":0},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":1},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":1},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0},{\"name\":\"new shirt EXCLUSIVE\",\"id\":6,\"views\":0}]", result);
+
+    }
     @AfterAll
     public static void resetDb() {
         productDAO.deleteAll();

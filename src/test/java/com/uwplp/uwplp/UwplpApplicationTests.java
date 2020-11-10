@@ -49,21 +49,6 @@ class UwplpApplicationTests {
             Assertions.assertNotNull(productDAO);
         }
     }
-    @Nested
-    class TestingDAOMock {
-        ProductDAO productDAO = Mockito.mock(ProductDAO.class);
-
-        TestingDAOMock() {
-            Mockito.when(productDAO.updateByID(1L, "lipstick", 3L)).thenReturn(new JSONArray("[200, OK]"));
-        }
-
-        @Test
-        void updateByID() {
-            JSONArray result = productDAO.updateByID(1L, "lipstick", 3L);
-            Assertions.assertEquals("[200,\"OK\"]", result.toString());
-        }
-
-    }
 
     @BeforeAll
     public static void fillDb() throws Exception {
@@ -73,6 +58,7 @@ class UwplpApplicationTests {
     }
 
     @Nested
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class DAOTesting {
         @Test
         @Order(1)
@@ -96,7 +82,7 @@ class UwplpApplicationTests {
             productDAO.updateFew(csvString);
             Thread.sleep(1000);
             JSONArray jsonArray = productDAO.readAll();
-            Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":0},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":0},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":0},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":0},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0},{\"name\":\"new shirt EXCLUSIVE\",\"id\":6,\"views\":0}]"
+            Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":0},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":1},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":0},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":0},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0},{\"name\":\"new shirt EXCLUSIVE\",\"id\":6,\"views\":0}]"
                     ,jsonArray.toString());
         }
     }
