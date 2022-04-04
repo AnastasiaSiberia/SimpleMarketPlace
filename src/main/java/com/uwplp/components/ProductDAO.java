@@ -3,6 +3,7 @@ package com.uwplp.components;
 import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -29,7 +30,7 @@ public class ProductDAO implements DAO{
     @Override
     public JSONArray readAll() {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT id, name, views FROM products",
+                "SELECT * FROM product",
                 (res, rowNum) -> new ProductModel(res)
         ));
         log.debug("the response for readAll was created");
@@ -37,40 +38,39 @@ public class ProductDAO implements DAO{
     }
 
     @Override
-    public JSONArray readByID(Long id) {
+    public JSONArray readByID(Long productId) {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT id, name, views FROM products WHERE id = ?", new Object[]{id},
+                "SELECT * FROM product WHERE product_id = ?", new Object[]{productId},
                 (res, rowNum) -> new ProductModel(res)
         ));
+        if(response.isEmpty()) {
+            log.warn("readByID didn't find a product with product_id = {}", productId);
+        }
         log.debug("the response for readByID was created");
-        if(response.size() > 0) {
-            response.get(0).addView();
-            updateByID(id, response.get(0).getName(), response.get(0).getViews());
-        }
-        else {
-            log.warn("readByID didn't find a product with id = {}", id);
-        }
         return new JSONArray(response);
     }
 
     @Override
-    public JSONArray updateByID(Long id, String name, Long views) {
-        jdbcTemplate.update("UPDATE products SET name = ?, views = ? WHERE id = ?", name, views, id);
-        return new JSONArray("[200, OK]");
+    public JSONArray updateByID(Long productId, ProductModel newModel) {
+        jdbcTemplate.update("UPDATE product SET product_name = ?, product_views = ?, product_reviews = ?, " +
+                "product_rating = ?, product_imagename = ? WHERE product_id = ?",
+                newModel.getProduct_name(), newModel.getProduct_views(), newModel.getProduct_reviews(),
+                newModel.getProduct_rating(), newModel.getProduct_imagename(), newModel.getProduct_id());
+        return new JSONArray(ResponseEntity.ok());
     }
 
     @Transactional
-    protected void updateTransaction(List <ProductModel> for_update, List <ProductModel> for_adding) {
-        List<Object[]> temp = for_adding.stream().map(
-                (x) -> new Object[] {x.getId(), x.getName()}
+    protected JSONArray updateTransaction(List <ProductModel> for_update, List <ProductModel> for_adding) {
+        List<Object[]> addList = for_adding.stream().map(
+                (x) -> new Object[] {x.getProduct_id(), x.getProduct_name()}
         ).collect(Collectors.toList());
-        jdbcTemplate.batchUpdate("INSERT INTO products(id, name, views) VALUES(?, ?, 0)", temp);
+        jdbcTemplate.batchUpdate("INSERT INTO product(product_id, product_name, product_views) VALUES(?, ?, 0)", addList);
 
-        temp = for_update.stream().map(
-                (x) -> new Object[] {x.getName(), x.getId()}
+        List<Object[]> updateList = for_update.stream().map(
+                (x) -> new Object[] {x.getProduct_name(), x.getProduct_imagename(), x.getProduct_id()}
         ).collect(Collectors.toList());
-        jdbcTemplate.batchUpdate("UPDATE products SET name = ? WHERE id = ?", temp);
-
+        jdbcTemplate.batchUpdate("UPDATE product SET product_name = ?, product_imagename = ? WHERE product_id = ?", updateList);
+        return new JSONArray(ResponseEntity.ok());
     }
 
     public JSONArray updateFew(String csvFile) {
@@ -81,7 +81,7 @@ public class ProductDAO implements DAO{
             log.debug("product was splitted");
             List <ProductModel> for_update = products.stream().filter(
                     (x) -> (jdbcTemplate.query(
-                            "SELECT id, name, views FROM products WHERE id = ?", new Object[]{x.getId()},
+                            "SELECT * FROM product WHERE product_id = ?", new Object[]{x.getProduct_id()},
                             (res, rowNum) -> new ProductModel(res)
                     ).size() == 1)
             ).collect(Collectors.toList());
@@ -89,7 +89,7 @@ public class ProductDAO implements DAO{
 
             List <ProductModel> for_adding = products.stream().filter(
                     (x) -> (jdbcTemplate.query(
-                            "SELECT id, name, views FROM products WHERE id = ?", new Object[]{x.getId()},
+                            "SELECT * FROM product WHERE product_id = ?", new Object[]{x.getProduct_id()},
                             (res, rowNum) -> new ProductModel(res)
                     ).size() == 0)
             ).collect(Collectors.toList());
@@ -101,14 +101,14 @@ public class ProductDAO implements DAO{
 
     public JSONArray getStatistic(Long maxSize) {
         List<ProductModel> statistic = jdbcTemplate.query(
-                "SELECT id, name, views FROM products ORDER BY views DESC LIMIT ?", new Object[] {maxSize},
+                "SELECT * FROM product ORDER BY product_views DESC LIMIT ?", new Object[] {maxSize},
                 (rs, rowNum) -> new ProductModel(rs)
                 );
         return new JSONArray(statistic);
     }
 
     public JSONArray deleteAll() {
-        jdbcTemplate.update("DELETE FROM products");
+        jdbcTemplate.update("DELETE FROM product");
         return new JSONArray("[200, OK]");
     }
 }

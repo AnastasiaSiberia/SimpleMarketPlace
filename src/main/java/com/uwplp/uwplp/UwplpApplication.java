@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UwplpApplication{
     public static final Logger log = LoggerFactory.getLogger(UwplpApplication.class);
     public static void main(String[] args) {
-        log.info("####################################RESTART##############################################");
         SpringApplication.run(UwplpApplication.class, args);
     }
 }

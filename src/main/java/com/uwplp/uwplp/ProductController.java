@@ -28,38 +28,28 @@ public class ProductController/* extends WebSecurityConfigurerAdapter*/ {
         this.productDAO = (ProductDAO)context.getBean("productDAO");
     }
 
-    @GetMapping
-    public String readAll() {
-        log.info("GET readAll");
+    @GetMapping("/products")
+    public String readAllProducts() {
+        log.info("the command \"readAll\" was gotten");
         return productDAO.readAll().toString();
     }
-    @GetMapping("/{id}")
+    @GetMapping("/products/{id}")
     public String readByID(@PathVariable("id") Long id) {
-        log.info("GET readByID");
         return productDAO.readByID(id).toString();
     }
-    @PostMapping("/{id}")
-    public String updateByID(@PathVariable("id") Long id, @RequestParam("name") String name, @RequestParam(value = "views", defaultValue = "0") Long views) {
-        log.info("POST updateByID");
-        log.debug("POST updateByID: {} {} {}",id, name, 0L);
+
+    /*@PostMapping("/products/{id}")
+    public String updateProductByID(@PathVariable("id") Long id,
+                             @RequestParam("name") String productName,
+                             @RequestParam(value = "views", defaultValue = "0") Long views) {
         return productDAO.updateByID(id, name, 0L).toString();
     }
-
-    /*@PostMapping()
-    public String updateFew(@RequestParam("csvFile") File csvFile) throws IOException {
-        String csvString = new String(Files.readAllBytes(csvFile.toPath()));
-        log.info("POST updateFew");
-        log.debug("POST updateFew:\n" + csvString);
-        return productDAO.updateFew(csvString).toString();
-    }*/
 
     @PostMapping()
     public String updateFew(@RequestParam("csvFile") MultipartFile csvFile) throws IOException {
         String csvString = new String(csvFile.getBytes(), StandardCharsets.UTF_8);
-        log.info("POST updateFew");
-        log.debug("POST updateFew:\n" + csvString);
         return productDAO.updateFew(csvString).toString();
-    }
+    }*/
 
     @PostMapping("/statistic")
     public String getStatistic(@RequestParam("maxSize") Long maxSize) {
@@ -70,8 +60,9 @@ public class ProductController/* extends WebSecurityConfigurerAdapter*/ {
     public String deleteAll() {
         return productDAO.deleteAll().toString();
     }
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello, World";
+
+    @GetMapping("/ping")
+    public String ping() {
+        return "pong";
     }
 }
