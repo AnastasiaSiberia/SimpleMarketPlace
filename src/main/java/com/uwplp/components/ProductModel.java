@@ -1,13 +1,14 @@
 package com.uwplp.components;
 
+import com.uwplp.utils.ResultSetColumnChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -20,76 +21,71 @@ public class ProductModel{
 
     private @Id Long product_id;
     private String product_name;
-    private Long product_views;
-    private Long product_reviews;
+    private String product_description;
+    private Long product_nviews;
+    private Long product_nreviews;
     private Double product_rating;
     private String product_imagename;
     private Long vendor_id;
 
     public ProductModel() {}
 
-    public ProductModel(String product_name, Long product_views) {
-        this.product_name = product_name;
-        this.product_views = product_views;
-    }
-
-    public ProductModel(Long product_id, String product_name, Long product_views) {
-        this.product_id = product_id;
-        this.product_name = product_name;
-        this.product_views = product_views;
-    }
-
-    public ProductModel(String string) {
-        String[] splitted = string.split(",");
-        log.debug(Arrays.toString(splitted));
-        this.product_id = Long.valueOf(splitted[0]);
-        this.product_name = splitted[1];
-        this.product_views = 0L;
-    }
-
     public ProductModel(ResultSet rs) throws SQLException {
+        ResultSetColumnChecker checker = new ResultSetColumnChecker(rs);
         this.product_id = rs.getLong("product_id");
-        this.product_name = rs.getString("product_name");
-        this.product_views = rs.getLong("product_views");
-        this.product_reviews = rs.getLong("product_reviews");
-        this.product_rating = rs.getDouble("product_rating");
-        this.product_imagename = rs.getString("product_imagename");
-        this.vendor_id = rs.getLong("vendor_id");
+        if(checker.hasColumn("product_name"))
+            this.product_name = rs.getString("product_name");
+        if(checker.hasColumn("product_description"))
+            this.product_description = rs.getString("product_description");
+        if(checker.hasColumn("product_nviews"))
+            this.product_nviews = rs.getLong("product_nviews");
+        if(checker.hasColumn("product_nreviews"))
+            this.product_nreviews = rs.getLong("product_nreviews");
+        if(checker.hasColumn("product_rating"))
+            this.product_rating = rs.getDouble("product_rating");
+        //this.product_imagename = rs.getString("product_imagename");
+        if(checker.hasColumn("vendor_id"))
+            this.vendor_id = rs.getLong("vendor_id");
     }
 
     public Long getProduct_id() {
         return product_id;
     }
 
-    public void setProduct_id(Long id) {
-        this.product_id = id;
+    public void setProduct_id(Long product_id) {
+        this.product_id = product_id;
     }
 
     public String getProduct_name() {
         return product_name;
     }
 
-    public void setProduct_name(String name) {
-        this.product_name = name;
+    public void setProduct_name(String product_name) {
+        this.product_name = product_name;
     }
 
-    public Long getProduct_views() {
-        return product_views;
+    public String getProduct_description() {
+        return product_description;
     }
 
-    public void setProduct_views(Long views) {
-        this.product_views = views;
-    }
-    public void addView() {
-        this.product_views++;
+    public void setProduct_description(String product_description) {
+        this.product_description = product_description;
     }
 
-    public Long getProduct_reviews() {
-        return product_reviews;
+    public Long getProduct_nviews() {
+        return product_nviews;
     }
 
-    public void setProduct_reviews(Long product_reviews) {
-        this.product_reviews = product_reviews;
+    public void setProduct_nviews(Long product_nviews) {
+        this.product_nviews = product_nviews;
+    }
+
+    public Long getProduct_nreviews() {
+        return product_nreviews;
+    }
+
+    public void setProduct_nreviews(Long product_nreviews) {
+        this.product_nreviews = product_nreviews;
     }
 
     public Double getProduct_rating() {
@@ -117,28 +113,15 @@ public class ProductModel{
     }
 
     @Override
-    public String toString() {
-        return "ProductModel{" +
-                "product_id=" + product_id +
-                ", product_name='" + product_name + '\'' +
-                ", product_views=" + product_views +
-                ", product_reviews=" + product_reviews +
-                ", product_rating=" + product_rating +
-                ", product_imagename='" + product_imagename + '\'' +
-                ", vendor_id=" + vendor_id +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductModel that = (ProductModel) o;
-        return product_id.equals(that.product_id) && product_name.equals(that.product_name) && Objects.equals(product_views, that.product_views) && Objects.equals(product_reviews, that.product_reviews) && Objects.equals(product_rating, that.product_rating) && Objects.equals(product_imagename, that.product_imagename) && vendor_id.equals(that.vendor_id);
+        return product_id.equals(that.product_id) && product_name.equals(that.product_name) && product_description.equals(that.product_description) && product_nviews.equals(that.product_nviews) && product_nreviews.equals(that.product_nreviews) && product_rating.equals(that.product_rating) && vendor_id.equals(that.vendor_id);
     }
 
     @Override
     public int hashCode() {
-        return hash(product_id, product_name, product_views, product_reviews, product_rating, product_imagename, vendor_id);
+        return hash(product_id, product_name, product_description, product_nviews, product_nreviews, product_rating, vendor_id);
     }
 }

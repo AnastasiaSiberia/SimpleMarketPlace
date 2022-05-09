@@ -1,6 +1,6 @@
 package com.uwplp.uwplp;
 
-import com.uwplp.components.ProductDAO;
+import com.uwplp.components.ProductsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +17,6 @@ import javax.sql.DataSource;
 public class ApplicationContext {
     private static final Logger log = LoggerFactory.getLogger(ApplicationContext.class);
 
-    @PostConstruct
-    public void Init() {
-        log.info("####################################APLICATIONCONTEXTRESTART##############################################");
-    }
-
     @Bean
     public DataSource productDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -33,8 +28,7 @@ public class ApplicationContext {
     }
 
     @Bean
-    public ProductDAO productDAO() {
-        log.info("productDAO is CREATING");
-        return new ProductDAO(productDataSource());
+    public ProductsDAO productDAO() {
+        return new ProductsDAO(productDataSource());
     }
 }

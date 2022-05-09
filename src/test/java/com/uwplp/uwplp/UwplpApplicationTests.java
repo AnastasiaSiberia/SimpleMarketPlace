@@ -1,6 +1,6 @@
 package com.uwplp.uwplp;
 
-import com.uwplp.components.ProductDAO;
+import com.uwplp.components.ProductsDAO;
 import org.aspectj.lang.annotation.After;
 import org.json.JSONArray;
 import org.junit.jupiter.api.*;
@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 class UwplpApplicationTests {
     private static final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(com.uwplp.uwplp.ApplicationContext.class);
-    private static final ProductDAO productDAO = (ProductDAO) context.getBean("productDAO");
+    private static final ProductsDAO productsDAO = (ProductsDAO) context.getBean("productDAO");
     private static final Logger log = LoggerFactory.getLogger(UwplpApplicationTests.class);
 
     public UwplpApplicationTests() {
@@ -45,8 +45,8 @@ class UwplpApplicationTests {
         }
         @Test
         void daoLoads() {
-            ProductDAO productDAO = (ProductDAO) context.getBean("productDAO");
-            Assertions.assertNotNull(productDAO);
+            ProductsDAO productsDAO = (ProductsDAO) context.getBean("productDAO");
+            Assertions.assertNotNull(productsDAO);
         }
     }
 
@@ -63,7 +63,7 @@ class UwplpApplicationTests {
         @Test
         @Order(1)
         public void readAll() {
-            JSONArray jsonArray = productDAO.readAll();
+            JSONArray jsonArray = productsDAO.readAll();
             System.out.println(jsonArray);
             Assertions.assertTrue(jsonArray.toString().length() > 0);
         }
@@ -71,21 +71,17 @@ class UwplpApplicationTests {
         @Test
         @Order(2)
         public void readByID() {
-            JSONArray jsonArray = productDAO.readByID(0L);
-            System.out.println(jsonArray);
-            Assertions.assertTrue(jsonArray.toString().length() > 0);
+            var list = productsDAO.readByID(0L);
+            System.out.println(list);
+            Assertions.assertTrue(list.toString().length() > 0);
         }
 
         @Test
         @Order(3)
-        public void updateFew() throws Exception {
-            File file = ResourceUtils.getFile("classpath:test2.csv");
-            String csvString = new String(Files.readAllBytes(file.toPath()));
-            productDAO.updateFew(csvString);
-            Thread.sleep(1000);
-            JSONArray jsonArray = productDAO.readAll();
-            Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":0},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":1},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":0},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":0},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0},{\"name\":\"new shirt EXCLUSIVE\",\"id\":6,\"views\":0}]"
-                    ,jsonArray.toString());
+        public void readAllProductInfo() {
+            var list = productsDAO.readAllProductInfo();
+            System.out.println(list);
+            Assertions.assertTrue(list.toString().length() > 0);
         }
     }
 }

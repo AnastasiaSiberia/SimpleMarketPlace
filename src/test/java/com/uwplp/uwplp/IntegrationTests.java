@@ -1,6 +1,6 @@
 package com.uwplp.uwplp;
 
-import com.uwplp.components.ProductDAO;
+import com.uwplp.components.ProductsDAO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ class IntegrationTests {
     @Autowired
     private MockMvc mockMvc;
     private static final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(com.uwplp.uwplp.ApplicationContext.class);
-    private static final ProductDAO productDAO = (ProductDAO) context.getBean("productDAO");
+    private static final ProductsDAO productsDAO = (ProductsDAO) context.getBean("productDAO");
     @LocalServerPort
     private int port;
     @Autowired
@@ -77,12 +77,12 @@ class IntegrationTests {
         mockMvc.perform(post("/uwplp/").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(map);.requestAttr("csvFile", ResourceUtils.getFile("classpath:test2.csv"))).andExpect(status().isOk());
     }*/
 
-    @BeforeAll
+    /*@BeforeAll
     public static void fillDb() throws Exception {
         File file = ResourceUtils.getFile("classpath:test.csv");
         String csvString = new String(Files.readAllBytes(file.toPath()));
-        productDAO.updateFew(csvString);
-    }
+        productsDAO.updateFew(csvString);
+    }*/
 
     @Test
     @Order(1)
@@ -118,9 +118,9 @@ class IntegrationTests {
         Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":1},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":0},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":1},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":1},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0},{\"name\":\"new shirt EXCLUSIVE\",\"id\":6,\"views\":0}]", result);
 
     }
-    @AfterAll
+    /*@AfterAll
     public static void resetDb() {
-        productDAO.deleteAll();
-    }
+        productsDAO.deleteAll();
+    }*/
 
 }
