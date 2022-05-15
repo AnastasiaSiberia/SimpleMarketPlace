@@ -1,24 +1,15 @@
 package com.uwplp.uwplp;
 
-import com.uwplp.components.ProductsDAO;
-import org.aspectj.lang.annotation.After;
+import com.uwplp.components.DAO.ProductsDAO;
 import org.json.JSONArray;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.ResourceUtils;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

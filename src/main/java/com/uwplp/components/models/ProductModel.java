@@ -1,4 +1,4 @@
-package com.uwplp.components;
+package com.uwplp.components.models;
 
 import com.uwplp.utils.ResultSetColumnChecker;
 import org.slf4j.Logger;
@@ -8,10 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Objects;
 
 import static java.util.Objects.hash;
 

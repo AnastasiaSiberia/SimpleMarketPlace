@@ -1,6 +1,7 @@
 package com.uwplp.uwplp;
 
-import com.uwplp.components.ProductsDAO;
+import com.uwplp.components.DAO.ProductsDAO;
+import com.uwplp.components.DAO.UsersDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +9,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 
@@ -18,7 +18,7 @@ public class ApplicationContext {
     private static final Logger log = LoggerFactory.getLogger(ApplicationContext.class);
 
     @Bean
-    public DataSource productDataSource() {
+    public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setUrl("jdbc:postgresql://localhost:5432/simplemarket");
@@ -28,7 +28,12 @@ public class ApplicationContext {
     }
 
     @Bean
-    public ProductsDAO productDAO() {
-        return new ProductsDAO(productDataSource());
+    public ProductsDAO productsDAO() {
+        return new ProductsDAO(dataSource());
+    }
+
+    @Bean
+    public UsersDAO usersDAO() {
+        return new UsersDAO(dataSource());
     }
 }

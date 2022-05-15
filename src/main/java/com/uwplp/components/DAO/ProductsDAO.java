@@ -1,15 +1,14 @@
-package com.uwplp.components;
+package com.uwplp.components.DAO;
 
+import com.uwplp.components.models.ProductModel;
 import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 public class ProductsDAO{
     private final JdbcTemplate jdbcTemplate;

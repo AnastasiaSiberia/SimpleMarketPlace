@@ -1,6 +1,6 @@
 package com.uwplp.uwplp;
 
-import com.uwplp.components.ProductsDAO;
+import com.uwplp.components.DAO.ProductsDAO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -25,10 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -63,12 +60,12 @@ class IntegrationTests {
     @Test
     @Order(1)
     public void readByIdOnlyWeb() throws Exception {
-        mockMvc.perform(get("/uwplp/3")).andExpect(status().isOk())
+        mockMvc.perform(get("/3")).andExpect(status().isOk())
                 .andExpect(content().string(containsString("[{\"name\":\"blouse\",\"id\":3,\"views\":1}]")));
     }
     @Test
     public void updateByIdOnlyWeb() throws Exception {
-        mockMvc.perform(post("/uwplp/4").param("name","skirt MUSA").param("views", "0")).andExpect(status().isOk());
+        mockMvc.perform(post("/4").param("name","skirt MUSA").param("views", "0")).andExpect(status().isOk());
     }
     /*@Test
     public void updateFewOnlyWeb() throws Exception {
@@ -87,7 +84,7 @@ class IntegrationTests {
     @Test
     @Order(1)
     public void readById() {
-        String result = new String(restTemplate.getForObject("http://localhost:" + port + "uwplp/1", String.class).getBytes(), StandardCharsets.UTF_8);
+        String result = new String(restTemplate.getForObject("http://localhost:" + port + "1", String.class).getBytes(), StandardCharsets.UTF_8);
         log.debug("readById give " + result);
         Assertions.assertEquals("[{\"name\":\"shoes\",\"id\":1,\"views\":1}]", result);
     }
@@ -99,8 +96,8 @@ class IntegrationTests {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("name", "skirt MUSA");
         HttpEntity<MultiValueMap<String, String> > request = new HttpEntity<>(map, httpHeaders);
-        restTemplate.postForObject("http://localhost:" + port + "uwplp/4", request, String.class);
-        String result = new String(restTemplate.getForObject("http://localhost:" + port + "uwplp/4", String.class).getBytes(), StandardCharsets.UTF_8);
+        restTemplate.postForObject("http://localhost:" + port + "4", request, String.class);
+        String result = new String(restTemplate.getForObject("http://localhost:" + port + "4", String.class).getBytes(), StandardCharsets.UTF_8);
         Assertions.assertEquals("[{\"name\":\"skirt MUSA\",\"id\":4,\"views\":1}]", result);
     }
 
@@ -110,10 +107,10 @@ class IntegrationTests {
         ResultMatcher ok = MockMvcResultMatchers.status().isOk();
         File file = ResourceUtils.getFile("classpath:test2.csv");
         MockHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.multipart("/uwplp/").file("csvFile", Files.readAllBytes(file.toPath()));
+                MockMvcRequestBuilders.multipart("/").file("csvFile", Files.readAllBytes(file.toPath()));
         this.mockMvc.perform(builder).andExpect(ok)
                 .andDo(MockMvcResultHandlers.print());
-        String result = new String(restTemplate.getForObject("http://localhost:" + port + "uwplp/", String.class).getBytes(), StandardCharsets.UTF_8);
+        String result = new String(restTemplate.getForObject("http://localhost:" + port + "/", String.class).getBytes(), StandardCharsets.UTF_8);
         log.debug("updateFew " + result);
         Assertions.assertEquals("[{\"name\":\"shoes Jiccardo\",\"id\":1,\"views\":1},{\"name\":\"boots Riccardo\",\"id\":2,\"views\":0},{\"name\":\"blouse Dolca&Gubanno\",\"id\":3,\"views\":1},{\"name\":\"skirt Gussi\",\"id\":4,\"views\":1},{\"name\":\"lipstick Maybeenwill New York\",\"id\":5,\"views\":0},{\"name\":\"new shirt EXCLUSIVE\",\"id\":6,\"views\":0}]", result);
 
