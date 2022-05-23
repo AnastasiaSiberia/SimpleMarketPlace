@@ -23,7 +23,7 @@ public class ProductModel{
     private Long product_nreviews;
     private Double product_rating;
     private String product_imagename;
-    private Long vendor_id;
+    private String vendorName;
 
     public ProductModel() {}
 
@@ -31,7 +31,7 @@ public class ProductModel{
         ResultSetColumnChecker checker = new ResultSetColumnChecker(rs);
         this.product_id = rs.getLong("product_id");
         if(checker.hasColumn("product_name"))
-            this.product_name = rs.getString("product_name");
+            this.product_name = rs.getString("product_name").trim();
         if(checker.hasColumn("product_description"))
             this.product_description = rs.getString("product_description");
         if(checker.hasColumn("product_nviews"))
@@ -41,8 +41,8 @@ public class ProductModel{
         if(checker.hasColumn("product_rating"))
             this.product_rating = rs.getDouble("product_rating");
         //this.product_imagename = rs.getString("product_imagename");
-        if(checker.hasColumn("vendor_id"))
-            this.vendor_id = rs.getLong("vendor_id");
+        if(checker.hasColumn("username"))
+            this.vendorName = rs.getString("username");
     }
 
     public Long getProduct_id() {
@@ -101,12 +101,8 @@ public class ProductModel{
         this.product_imagename = product_imagename;
     }
 
-    public Long getVendor_id() {
-        return vendor_id;
-    }
-
-    public void setVendor_id(Long vendor_id) {
-        this.vendor_id = vendor_id;
+    public String getVendorName() {
+        return vendorName;
     }
 
     @Override
@@ -114,11 +110,11 @@ public class ProductModel{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductModel that = (ProductModel) o;
-        return product_id.equals(that.product_id) && product_name.equals(that.product_name) && product_description.equals(that.product_description) && product_nviews.equals(that.product_nviews) && product_nreviews.equals(that.product_nreviews) && product_rating.equals(that.product_rating) && vendor_id.equals(that.vendor_id);
+        return product_id.equals(that.product_id) && product_name.equals(that.product_name) && product_description.equals(that.product_description) && product_nviews.equals(that.product_nviews) && product_nreviews.equals(that.product_nreviews) && product_rating.equals(that.product_rating) && vendorName.equals(that.vendorName);
     }
 
     @Override
     public int hashCode() {
-        return hash(product_id, product_name, product_description, product_nviews, product_nreviews, product_rating, vendor_id);
+        return hash(product_id, product_name, product_description, product_nviews, product_nreviews, product_rating, vendorName);
     }
 }

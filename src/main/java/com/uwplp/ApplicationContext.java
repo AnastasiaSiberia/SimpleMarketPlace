@@ -1,4 +1,4 @@
-package com.uwplp.uwplp;
+package com.uwplp;
 
 import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.components.DAO.UsersDAO;
@@ -17,6 +17,15 @@ import javax.sql.DataSource;
 public class ApplicationContext {
     private static final Logger log = LoggerFactory.getLogger(ApplicationContext.class);
 
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurerAdapter() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+//            }
+//        };
+//    }
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();

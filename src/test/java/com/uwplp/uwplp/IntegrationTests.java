@@ -1,5 +1,6 @@
 package com.uwplp.uwplp;
 
+import com.uwplp.ApplicationContext;
 import com.uwplp.components.DAO.ProductsDAO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +44,7 @@ class IntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
-    private static final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(com.uwplp.uwplp.ApplicationContext.class);
+    private static final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class);
     private static final ProductsDAO productsDAO = (ProductsDAO) context.getBean("productDAO");
     @LocalServerPort
     private int port;

@@ -13,7 +13,7 @@ import java.util.List;
 public class ProductsDAO{
     private final JdbcTemplate jdbcTemplate;
     private static final Logger log = LoggerFactory.getLogger(ProductsDAO.class);
-    private final String tableName = "products";
+    public static final String TABLENAME = "products";
 
     public ProductsDAO (DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
@@ -21,7 +21,7 @@ public class ProductsDAO{
 
     public JSONArray readAll() {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT * FROM " + tableName,
+                "SELECT * FROM " + TABLENAME,
                 (res, rowNum) -> new ProductModel(res)
         ));
         log.debug("the response for readAll was created");
@@ -29,14 +29,15 @@ public class ProductsDAO{
     }
     public List<ProductModel> readAllProductInfo() {
         return new ArrayList<>(jdbcTemplate.query(
-                "SELECT product_id, product_name, product_nviews, product_rating, vendor_id FROM " + tableName,
+                "SELECT product_id, product_name, product_nviews, product_rating, username FROM " + TABLENAME +
+                        " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id" ,
                 (res, rowNum) -> new ProductModel(res)
         ));
     }
 
     public ProductModel readByID(Long productId) {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT * FROM " + tableName + " WHERE product_id = ?",
+                "SELECT * FROM " + TABLENAME + " WHERE product_id = ?",
                 new Object[]{productId},
                 (res, rowNum) -> new ProductModel(res)
         ));
@@ -53,7 +54,7 @@ public class ProductsDAO{
         return new JSONArray(ResponseEntity.ok());
     }*/
     public JSONArray deleteAll() {
-        jdbcTemplate.update("DELETE FROM " + tableName);
+        jdbcTemplate.update("DELETE FROM " + TABLENAME);
         return new JSONArray("[200, OK]");
     }
 

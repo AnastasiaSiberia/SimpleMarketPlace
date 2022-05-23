@@ -1,5 +1,6 @@
 package com.uwplp.uwplp;
 
+import com.uwplp.ApplicationContext;
 import com.uwplp.components.DAO.ProductsDAO;
 import org.json.JSONArray;
 import org.junit.jupiter.api.*;
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 class UwplpApplicationTests {
-    private static final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(com.uwplp.uwplp.ApplicationContext.class);
+    private static final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class);
     private static final ProductsDAO productsDAO = (ProductsDAO) context.getBean("productDAO");
     private static final Logger log = LoggerFactory.getLogger(UwplpApplicationTests.class);
 

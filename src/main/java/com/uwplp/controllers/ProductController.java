@@ -1,15 +1,18 @@
-package com.uwplp.uwplp;
+package com.uwplp.controllers;
 
 import com.uwplp.components.DAO.UsersDAO;
 import com.uwplp.components.models.ProductModel;
 import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.components.models.UserModel;
+import com.uwplp.ApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,8 +69,21 @@ public class ProductController {
     }*/
 
     @GetMapping("/admin/users")
-    public List<UserModel> readAllUsers() {
-        return usersDAO.readAllUserData();
+    public ResponseEntity readAllUsers() {
+        List <UserModel> body = usersDAO.readAllUserData();
+        log.debug(body.toString());
+        return ResponseEntity.ok()
+                .body(body);
     }
 
+    public String getCurrentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getName();
+    }
+    @GetMapping("/cur_userinfo")
+    public ResponseEntity getCurUser() {
+        log.debug(getCurrentUsername());
+        return ResponseEntity.ok()
+                .body(usersDAO.getByUsername(getCurrentUsername()));
+    }
 }
