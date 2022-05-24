@@ -54,7 +54,7 @@ public class AuthenticationController {
     public ResponseEntity<?> getUserInfo(Principal user) {
         User userObj = (User) userDetailsService.loadUserByUsername(user.getName());
         UserInfo userInfo = new UserInfo();
-        userInfo.setUserName(userObj.getUserName());
+        userInfo.setUsername(userObj.getUserName());
         userInfo.setRoles(userObj.getAuthorities().toArray());
         return ResponseEntity.ok(userInfo);
     }

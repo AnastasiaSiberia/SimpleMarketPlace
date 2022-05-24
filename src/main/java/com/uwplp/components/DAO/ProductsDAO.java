@@ -49,12 +49,13 @@ public class ProductsDAO{
     public Long getIdToAdd() {
         List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLENAME);
         Long id = maxIds.isEmpty() ? 0L : Long.parseLong(maxIds.get(0).get("max").toString());
-        return id;
+        return id + 1;
     }
     public void addProduct(ProductModel productModel) {
         productModel.setProduct_id(getIdToAdd());
         String command = String.format(
-                "INSERT INTO %s(product_id, product_name, product_description, vendor_id)  values(%d, %s, %s, %d)",
+                "INSERT INTO %s(product_id, product_name, product_description, vendor_id)  values(%d, '%s', '%s', %d)",
+                TABLENAME,
                 productModel.getProduct_id(),
                 productModel.getProduct_name(),
                 productModel.getProduct_description(),

@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -75,21 +76,19 @@ public class ProductController {
         return ResponseEntity.ok()
                 .body(body);
     }
-/*
-public String getCurrentUsername() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getName();
-    }
 
-    @GetMapping("/add_product")
-    public ResponseEntity addProduct(String productName, String productDescription) {
+    @PostMapping("/add_product")
+    public ResponseEntity addProduct(Principal user, @RequestBody ProductModel productModel) {
         log.debug("addProduct was called");
-        Long vendorId = usersDAO.getByUsername(getCurrentUsername()).getUserId();
-        ProductModel productModel = new ProductModel();
-        productModel.setProduct_name(productName);
-        productModel.setProduct_description(productDescription);
+        log.debug(user.getName());
+        Long vendorId = usersDAO.getByUsername(user.getName()).getUserId();
         productModel.setVendor_id(vendorId);
         productsDAO.addProduct(productModel);
-        return ResponseEntity.ok().body(null);
-    }*/
+        return ResponseEntity.ok(null);
+    }
+
+    @PostMapping("/only_vendor")
+    public ResponseEntity onlyVendor(Principal user, @RequestBody ProductModel productModel) {
+        return ResponseEntity.ok(user.getName() + " " + productModel);
+    }
 }

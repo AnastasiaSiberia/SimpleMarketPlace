@@ -23,7 +23,7 @@ public class ProductModel{
     private Long product_nreviews;
     private Double product_rating;
     private String product_imagename;
-    private String vendorName;
+    private String vendor_name;
 
     private Long vendor_id;
 
@@ -44,7 +44,7 @@ public class ProductModel{
             this.product_rating = rs.getDouble("product_rating");
         //this.product_imagename = rs.getString("product_imagename");
         if(checker.hasColumn("username"))
-            this.vendorName = rs.getString("username");
+            this.vendor_name = rs.getString("username");
         if(checker.hasColumn("vendor_id"))
             this.vendor_id = rs.getLong("vendor_id");
     }
@@ -105,12 +105,12 @@ public class ProductModel{
         this.product_imagename = product_imagename;
     }
 
-    public String getVendorName() {
-        return vendorName;
+    public String getVendor_name() {
+        return vendor_name;
     }
 
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
+    public void setVendor_name(String vendorName) {
+        this.vendor_name = vendorName;
     }
 
     public Long getVendor_id() {
@@ -119,6 +119,21 @@ public class ProductModel{
 
     public void setVendor_id(Long vendor_id) {
         this.vendor_id = vendor_id;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductModel{" +
+                "product_id=" + product_id +
+                ", product_name='" + product_name + '\'' +
+                ", product_description='" + product_description + '\'' +
+                ", product_nviews=" + product_nviews +
+                ", product_nreviews=" + product_nreviews +
+                ", product_rating=" + product_rating +
+                ", product_imagename='" + product_imagename + '\'' +
+                ", vendorName='" + vendor_name + '\'' +
+                ", vendor_id=" + vendor_id +
+                '}';
     }
 
     @Override
@@ -132,13 +147,13 @@ public class ProductModel{
                 && product_nviews.equals(that.product_nviews)
                 && product_nreviews.equals(that.product_nreviews)
                 && product_rating.equals(that.product_rating)
-                && vendorName.equals(that.vendorName)
+                && vendor_name.equals(that.vendor_name)
                 && vendor_id.equals(that.vendor_id);
     }
 
     @Override
     public int hashCode() {
-        return hash(product_id, product_name, product_description, product_nviews, product_nreviews, product_rating, vendorName, vendor_id);
+        return hash(product_id, product_name, product_description, product_nviews, product_nreviews, product_rating, vendor_name, vendor_id);
     }
 
 }
