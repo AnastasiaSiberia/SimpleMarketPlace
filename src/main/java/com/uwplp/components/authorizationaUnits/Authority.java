@@ -5,7 +5,6 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
-
 public class Authority implements GrantedAuthority {
 
 	private Long id;
@@ -14,16 +13,16 @@ public class Authority implements GrantedAuthority {
 
 	private String roleDescription;
 
-	public Authority() {}
-
 	public Authority(UserModel userModel) {
-		this.id = Long.valueOf(userModel.getUserRole().ordinal());
-		this.roleCode = userModel.getUserRole().toString();
-		this.roleDescription = "";
+		this.id = userModel.getUserId();
+		this.setRoleCode(userModel.getUserRole().toString());
+		this.setRoleDescription("");
 	}
+	
 
 	@Override
 	public String getAuthority() {
+		// TODO Auto-generated method stub
 		return roleCode;
 	}
 
@@ -63,6 +62,6 @@ public class Authority implements GrantedAuthority {
 		this.roleDescription = roleDescription;
 	}
 
-
-
+	
+	
 }

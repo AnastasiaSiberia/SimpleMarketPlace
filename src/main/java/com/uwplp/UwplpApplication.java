@@ -20,6 +20,7 @@ public class UwplpApplication{
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/profile").allowedOrigins("http://localhost:3000");
+                registry.addMapping("/cur_userinfo").allowedOrigins("http://localhost:3000").allowCredentials(true);
                 registry.addMapping("/auth/login")
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST")

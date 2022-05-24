@@ -75,15 +75,21 @@ public class ProductController {
         return ResponseEntity.ok()
                 .body(body);
     }
-
-    public String getCurrentUsername() {
+/*
+public String getCurrentUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth.getName();
     }
-    @GetMapping("/cur_userinfo")
-    public ResponseEntity getCurUser() {
-        log.debug(getCurrentUsername());
-        return ResponseEntity.ok()
-                .body(usersDAO.getByUsername(getCurrentUsername()));
-    }
+
+    @GetMapping("/add_product")
+    public ResponseEntity addProduct(String productName, String productDescription) {
+        log.debug("addProduct was called");
+        Long vendorId = usersDAO.getByUsername(getCurrentUsername()).getUserId();
+        ProductModel productModel = new ProductModel();
+        productModel.setProduct_name(productName);
+        productModel.setProduct_description(productDescription);
+        productModel.setVendor_id(vendorId);
+        productsDAO.addProduct(productModel);
+        return ResponseEntity.ok().body(null);
+    }*/
 }

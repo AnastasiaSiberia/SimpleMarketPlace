@@ -1,7 +1,7 @@
 package com.uwplp.services;
 
-import com.uwplp.components.authorizationaUnits.User;
 import com.uwplp.components.DAO.UsersDAO;
+import com.uwplp.components.authorizationaUnits.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserService implements UserDetailsService {
     @Autowired
-    private UsersDAO usersDAO;
+    UsersDAO usersDAO;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -20,12 +20,5 @@ public class CustomUserService implements UserDetailsService {
             throw new UsernameNotFoundException("Username " + username + " not found");
         }
         return user;
-    }
-
-    @Override
-    public String toString() {
-        return "CustomUserService{" +
-                "usersDAO=" + usersDAO +
-                '}';
     }
 }

@@ -25,6 +25,8 @@ public class ProductModel{
     private String product_imagename;
     private String vendorName;
 
+    private Long vendor_id;
+
     public ProductModel() {}
 
     public ProductModel(ResultSet rs) throws SQLException {
@@ -43,6 +45,8 @@ public class ProductModel{
         //this.product_imagename = rs.getString("product_imagename");
         if(checker.hasColumn("username"))
             this.vendorName = rs.getString("username");
+        if(checker.hasColumn("vendor_id"))
+            this.vendor_id = rs.getLong("vendor_id");
     }
 
     public Long getProduct_id() {
@@ -105,16 +109,36 @@ public class ProductModel{
         return vendorName;
     }
 
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
+    }
+
+    public Long getVendor_id() {
+        return vendor_id;
+    }
+
+    public void setVendor_id(Long vendor_id) {
+        this.vendor_id = vendor_id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductModel that = (ProductModel) o;
-        return product_id.equals(that.product_id) && product_name.equals(that.product_name) && product_description.equals(that.product_description) && product_nviews.equals(that.product_nviews) && product_nreviews.equals(that.product_nreviews) && product_rating.equals(that.product_rating) && vendorName.equals(that.vendorName);
+        return product_id.equals(that.product_id)
+                && product_name.equals(that.product_name)
+                && product_description.equals(that.product_description)
+                && product_nviews.equals(that.product_nviews)
+                && product_nreviews.equals(that.product_nreviews)
+                && product_rating.equals(that.product_rating)
+                && vendorName.equals(that.vendorName)
+                && vendor_id.equals(that.vendor_id);
     }
 
     @Override
     public int hashCode() {
-        return hash(product_id, product_name, product_description, product_nviews, product_nreviews, product_rating, vendorName);
+        return hash(product_id, product_name, product_description, product_nviews, product_nreviews, product_rating, vendorName, vendor_id);
     }
+
 }

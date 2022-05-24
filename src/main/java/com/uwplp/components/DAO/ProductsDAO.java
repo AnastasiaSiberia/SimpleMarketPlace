@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ProductsDAO{
     private final JdbcTemplate jdbcTemplate;
@@ -29,7 +30,7 @@ public class ProductsDAO{
     }
     public List<ProductModel> readAllProductInfo() {
         return new ArrayList<>(jdbcTemplate.query(
-                "SELECT product_id, product_name, product_nviews, product_rating, username FROM " + TABLENAME +
+                "SELECT product_id, product_name, product_nviews, product_rating, vendor_id, username FROM " + TABLENAME +
                         " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id" ,
                 (res, rowNum) -> new ProductModel(res)
         ));
@@ -45,6 +46,22 @@ public class ProductsDAO{
         return response.get(0);
     }
 
+    public Long getIdToAdd() {
+        List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLENAME);
+        Long id = maxIds.isEmpty() ? 0L : Long.parseLong(maxIds.get(0).get("max").toString());
+        return id;
+    }
+    public void addProduct(ProductModel productModel) {
+        productModel.setProduct_id(getIdToAdd());
+        String command = String.format(
+                "INSERT INTO %s(product_id, product_name, product_description, vendor_id)  values(%d, %s, %s, %d)",
+                productModel.getProduct_id(),
+                productModel.getProduct_name(),
+                productModel.getProduct_description(),
+                productModel.getVendor_id()
+        );
+        jdbcTemplate.execute(command);
+    }
     /*@Override
     public JSONArray updateByID(Long productId, ProductModel newModel) {
         jdbcTemplate.update("UPDATE ? SET product_name = ?, product_views = ?, product_reviews = ?, " +

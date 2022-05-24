@@ -21,7 +21,7 @@ public class UsersDAO {
     public UserModel getByUsername(String username) {
 
         List <UserModel> res = jdbcTemplate.query(
-                "SELECT user_id, username, user_role FROM " + TABLENAME + " where username = \'" + username + "\'",
+                "SELECT * FROM " + TABLENAME + " where username = \'" + username + "\'",
                 (rs, rowNum) -> new UserModel(rs)
         );
         if(res.isEmpty()) {
