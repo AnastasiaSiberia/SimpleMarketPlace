@@ -22,7 +22,6 @@ public class ProductModel{
     private Long product_nviews;
     private Long product_nreviews;
     private Double product_rating;
-    private String product_imagename;
     private String vendor_name;
 
     private Long vendor_id;
@@ -42,7 +41,6 @@ public class ProductModel{
             this.product_nreviews = rs.getLong("product_nreviews");
         if(checker.hasColumn("product_rating"))
             this.product_rating = rs.getDouble("product_rating");
-        //this.product_imagename = rs.getString("product_imagename");
         if(checker.hasColumn("username"))
             this.vendor_name = rs.getString("username");
         if(checker.hasColumn("vendor_id"))
@@ -97,14 +95,6 @@ public class ProductModel{
         this.product_rating = product_rating;
     }
 
-    public String getProduct_imagename() {
-        return product_imagename;
-    }
-
-    public void setProduct_imagename(String product_imagename) {
-        this.product_imagename = product_imagename;
-    }
-
     public String getVendor_name() {
         return vendor_name;
     }
@@ -130,7 +120,6 @@ public class ProductModel{
                 ", product_nviews=" + product_nviews +
                 ", product_nreviews=" + product_nreviews +
                 ", product_rating=" + product_rating +
-                ", product_imagename='" + product_imagename + '\'' +
                 ", vendorName='" + vendor_name + '\'' +
                 ", vendor_id=" + vendor_id +
                 '}';

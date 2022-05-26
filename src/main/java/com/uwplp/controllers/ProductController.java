@@ -5,16 +5,27 @@ import com.uwplp.components.models.ProductModel;
 import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.components.models.UserModel;
 import com.uwplp.ApplicationContext;
+import com.uwplp.services.CloudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.websocket.server.PathParam;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.List;
 
@@ -24,6 +35,10 @@ public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
     private static ProductsDAO productsDAO;
     private static UsersDAO usersDAO;
+
+    @Autowired
+    private CloudService cloudService;
+
     public ProductController() {
         try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class)) {
             productsDAO = (ProductsDAO)context.getBean("productsDAO");
@@ -80,15 +95,27 @@ public class ProductController {
     @PostMapping("/add_product")
     public ResponseEntity addProduct(Principal user, @RequestBody ProductModel productModel) {
         log.debug("addProduct was called");
-        log.debug(user.getName());
+        productModel.setProduct_id(productsDAO.getNextId());
         Long vendorId = usersDAO.getByUsername(user.getName()).getUserId();
         productModel.setVendor_id(vendorId);
         productsDAO.addProduct(productModel);
+        return ResponseEntity.ok(productModel.getProduct_id());
+    }
+    @PostMapping("/product_image/upload/{product_id}")
+    public ResponseEntity loadFile(Principal user,
+                                   @PathVariable String product_id,
+                                   @RequestBody MultipartFile file) throws IOException {
+        cloudService.saveFile(user.getName(), product_id, file);
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/only_vendor")
-    public ResponseEntity onlyVendor(Principal user, @RequestBody ProductModel productModel) {
-        return ResponseEntity.ok(user.getName() + " " + productModel);
+    @GetMapping("/product_image/{vendor_name}/{product_id}")
+    public ResponseEntity getFile(@PathVariable String vendor_name, @PathVariable String product_id) throws FileNotFoundException {
+        File file = cloudService.getFile(vendor_name, product_id);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        return ResponseEntity.ok()
+                .contentLength(file.length())
+                .contentType(MediaType.IMAGE_JPEG) //APPLICATION_OCTET_STREAM
+                .body(resource);
     }
 }

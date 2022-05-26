@@ -50,9 +50,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint).and()
-                .authorizeRequests((request) -> request.antMatchers("/api/v1/auth/login", "/product_info").permitAll()
+                .authorizeRequests((request) -> request.antMatchers("/api/v1/auth/login",
+                                "/product_info",
+                                "/products/**",
+                                "/product_image/**/**").permitAll()
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .antMatchers("/add_product","/only_vendor").hasAuthority("VENDOR")
+                        .antMatchers("/add_product","/product_image/upload").hasAuthority("VENDOR")
                         .anyRequest().authenticated())
                 .addFilterBefore(new JWTAuthenticationFilter(userService, jWTTokenHelper),
                         UsernamePasswordAuthenticationFilter.class);

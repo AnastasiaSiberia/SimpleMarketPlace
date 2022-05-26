@@ -19,10 +19,10 @@ public class UwplpApplication{
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/v1/auth/userinfo")
+                registry.addMapping("/api/v1/**")
                         .allowedOrigins("http://localhost:3000")
                         .allowCredentials(true);
-                registry.addMapping("/only_vendor")
+                registry.addMapping("/product_image/upload/**")
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST")
                         .allowCredentials(true);
@@ -30,7 +30,7 @@ public class UwplpApplication{
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST")
                         .allowCredentials(true);
-                registry.addMapping("/api/v1/auth/login")
+                registry.addMapping("/product_image/**")
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST")
                         .allowCredentials(true)

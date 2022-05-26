@@ -38,7 +38,9 @@ public class ProductsDAO{
 
     public ProductModel readByID(Long productId) {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT * FROM " + TABLENAME + " WHERE product_id = ?",
+                "SELECT product_id, product_name, product_description," +
+                        "product_nviews, product_rating, vendor_id, username FROM " + TABLENAME +
+                        " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id " + " WHERE product_id = ?",
                 new Object[]{productId},
                 (res, rowNum) -> new ProductModel(res)
         ));
@@ -46,13 +48,12 @@ public class ProductsDAO{
         return response.get(0);
     }
 
-    public Long getIdToAdd() {
+    public Long getNextId() {
         List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLENAME);
         Long id = maxIds.isEmpty() ? 0L : Long.parseLong(maxIds.get(0).get("max").toString());
         return id + 1;
     }
     public void addProduct(ProductModel productModel) {
-        productModel.setProduct_id(getIdToAdd());
         String command = String.format(
                 "INSERT INTO %s(product_id, product_name, product_description, vendor_id)  values(%d, '%s', '%s', %d)",
                 TABLENAME,
