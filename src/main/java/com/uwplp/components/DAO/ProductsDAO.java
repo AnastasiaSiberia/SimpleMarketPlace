@@ -49,9 +49,12 @@ public class ProductsDAO{
     }
 
     public Long getNextId() {
-        List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLENAME);
-        Long id = maxIds.isEmpty() ? 0L : Long.parseLong(maxIds.get(0).get("max").toString());
-        return id + 1;
+        try {
+            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLENAME);
+            return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
+        } catch(NullPointerException exception) {
+            return 0L;
+        }
     }
     public void addProduct(ProductModel productModel) {
         String command = String.format(
