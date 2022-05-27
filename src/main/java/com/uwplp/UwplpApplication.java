@@ -21,6 +21,7 @@ public class UwplpApplication{
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/v1/**")
                         .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST")
                         .allowCredentials(true);
                 registry.addMapping("/product_image/upload/**")
                         .allowedOrigins("http://localhost:3000")

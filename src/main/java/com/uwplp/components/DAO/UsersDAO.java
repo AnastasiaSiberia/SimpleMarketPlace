@@ -1,12 +1,16 @@
 package com.uwplp.components.DAO;
 
 import com.uwplp.components.models.UserModel;
+import com.uwplp.components.requests.RegistrationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class UsersDAO {
     private final JdbcTemplate jdbcTemplate;
@@ -46,5 +50,30 @@ public class UsersDAO {
                 "SELECT user_id, username, user_role FROM " + TABLENAME,
                 (res, rowNum) -> new UserModel(res)
         ));
+    }
+
+    public Long getNextUserId() {
+        try {
+            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(user_id) from " + TABLENAME);
+            return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
+        } catch(NullPointerException exception) {
+            return 0L;
+        }
+    }
+    public void addUser(RegistrationRequest request) {
+        Long userId = getNextUserId();
+        String encodedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
+        String sqlCommand = String.format("INSERT INTO %s VALUES(%d, '%s', '%s', '%s')",
+                TABLENAME,
+                userId,
+                request.getUsername(),
+                "USER",
+                encodedPassword
+                );
+        try {
+            jdbcTemplate.execute(sqlCommand);
+        } catch (Exception ex) {
+            throw new RuntimeException("Пользователь с таким именем уже существует");
+        }
     }
 }
