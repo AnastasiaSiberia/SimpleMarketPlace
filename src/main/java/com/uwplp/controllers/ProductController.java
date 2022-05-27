@@ -1,6 +1,8 @@
 package com.uwplp.controllers;
 
+import com.uwplp.components.DAO.OrdersDAO;
 import com.uwplp.components.DAO.UsersDAO;
+import com.uwplp.components.models.OrderModel;
 import com.uwplp.components.models.ProductModel;
 import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.components.models.UserModel;
@@ -28,6 +30,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -35,6 +38,7 @@ public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
     private static ProductsDAO productsDAO;
     private static UsersDAO usersDAO;
+    private static OrdersDAO ordersDAO;
 
     @Autowired
     private CloudService cloudService;
@@ -43,6 +47,7 @@ public class ProductController {
         try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class)) {
             productsDAO = (ProductsDAO)context.getBean("productsDAO");
             usersDAO = (UsersDAO)context.getBean("usersDAO");
+            ordersDAO = (OrdersDAO)context.getBean("ordersDAO");
         }
     }
 
@@ -117,5 +122,18 @@ public class ProductController {
                 .contentLength(file.length())
                 .contentType(MediaType.IMAGE_JPEG) //APPLICATION_OCTET_STREAM
                 .body(resource);
+    }
+
+    @PostMapping("/buy")
+    public ResponseEntity buy(Principal user, @RequestBody List<OrderModel> orders) {
+        productsDAO.subtract(orders);
+        Long userId = usersDAO.getByUsername(user.getName()).getUserId();
+        orders = orders.stream().map((order) -> {
+            order.setOrder_id(ordersDAO.getNextId());
+            order.setUser_id(userId);
+            return order;
+        }).collect(Collectors.toList());
+        ordersDAO.addOrders(orders);
+        return ResponseEntity.ok("The order was added");
     }
 }

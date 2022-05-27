@@ -8,11 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 @ExtendWith(SpringExtension.class)
 public class AuthorizationTests {
-    @Autowired
-    private CloudService cloudService;
     @Test
     public void encoderTest() {
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY");
+        System.out.println("CURRDATE " + formatter.format(date));
+
     }
 }

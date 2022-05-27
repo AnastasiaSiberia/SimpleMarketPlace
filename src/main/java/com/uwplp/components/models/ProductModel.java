@@ -24,6 +24,10 @@ public class ProductModel{
     private Double product_rating;
     private String vendor_name;
 
+    private Long product_price;
+
+    private Long product_quantity;
+
     private Long vendor_id;
 
     public ProductModel() {}
@@ -45,6 +49,10 @@ public class ProductModel{
             this.vendor_name = rs.getString("username");
         if(checker.hasColumn("vendor_id"))
             this.vendor_id = rs.getLong("vendor_id");
+        if(checker.hasColumn("product_price"))
+            this.product_price = rs.getLong("product_price");
+        if(checker.hasColumn("product_quantity"))
+            this.product_quantity = rs.getLong("product_quantity");
     }
 
     public Long getProduct_id() {
@@ -109,6 +117,22 @@ public class ProductModel{
 
     public void setVendor_id(Long vendor_id) {
         this.vendor_id = vendor_id;
+    }
+
+    public Long getProduct_price() {
+        return product_price;
+    }
+
+    public void setProduct_price(Long product_price) {
+        this.product_price = product_price;
+    }
+
+    public Long getProduct_quantity() {
+        return product_quantity;
+    }
+
+    public void setProduct_quantity(Long product_quantity) {
+        this.product_quantity = product_quantity;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.uwplp;
 
+import com.uwplp.components.DAO.OrdersDAO;
 import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.components.DAO.UsersDAO;
 import org.slf4j.Logger;
@@ -44,5 +45,10 @@ public class ApplicationContext {
     @Bean
     public UsersDAO usersDAO() {
         return new UsersDAO(dataSource());
+    }
+
+    @Bean
+    public OrdersDAO ordersDAO() {
+        return new OrdersDAO(dataSource());
     }
 }

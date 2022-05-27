@@ -1,5 +1,6 @@
 package com.uwplp.components.DAO;
 
+import com.uwplp.components.models.OrderModel;
 import com.uwplp.components.models.ProductModel;
 import org.json.*;
 import org.slf4j.Logger;
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +40,7 @@ public class ProductsDAO{
 
     public ProductModel readByID(Long productId) {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT product_id, product_name, product_description," +
-                        "product_nviews, product_rating, vendor_id, username FROM " + TABLENAME +
+                "SELECT products.*, vendor_id, username FROM " + TABLENAME +
                         " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id " + " WHERE product_id = ?",
                 new Object[]{productId},
                 (res, rowNum) -> new ProductModel(res)
@@ -80,5 +81,18 @@ public class ProductsDAO{
         return new JSONArray("[200, OK]");
     }
 
+    void changeQuantity(Long productId, Long productQuantity) {
+        String command = String.format("UPDATE %s SET product_quantity = %d WHERE product_id = %d",
+                TABLENAME, productQuantity, productId);
+        jdbcTemplate.update(command);
+    }
 
+    public void subtract(List<OrderModel> orders) {
+        orders.forEach((order) -> {
+            ProductModel pm = readByID(order.getProduct_id());
+            order.setOrder_price(pm.getProduct_price());
+            order.setOrder_time(new Date());
+            changeQuantity(pm.getProduct_id(), pm.getProduct_quantity() - order.getOrder_size());
+        });
+    }
 }
