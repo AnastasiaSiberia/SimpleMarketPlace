@@ -1,15 +1,39 @@
 package com.uwplp.components.models;
 
 
+import com.uwplp.utils.ResultSetColumnChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
 public class OrderModel {
+
+    private static Logger log = LoggerFactory.getLogger(OrderModel.class);
     private Long order_id;
     private Long user_id;
     private Long product_id;
     private Long order_price;
     private Long order_size;
     private Date order_time;
+
+    public OrderModel(ResultSet rs) throws SQLException {
+        ResultSetColumnChecker checker = new ResultSetColumnChecker(rs);
+        if(checker.hasColumn("order_id"))
+            this.order_id = rs.getLong("order_id");
+        if(checker.hasColumn("user_id"))
+            this.user_id = rs.getLong("user_id");
+        if(checker.hasColumn("product_id"))
+            this.product_id = rs.getLong("product_id");
+        if(checker.hasColumn("order_price"))
+            this.order_price = rs.getLong("order_price");
+        if(checker.hasColumn("order_size"))
+            this.order_size = rs.getLong("order_size");
+        if(checker.hasColumn("order_time"))
+            this.order_time = rs.getDate("order_time");
+    }
 
     public Long getOrder_id() {
         return order_id;

@@ -1,13 +1,16 @@
 package com.uwplp.components.DAO;
 
 import com.uwplp.components.models.OrderModel;
+import com.uwplp.components.models.ProductModel;
 import com.uwplp.components.models.UserModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +47,15 @@ public class OrdersDAO {
             return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
         } catch(NullPointerException exception) {
             return 0L;
+        }
+    }
+
+    public List<OrderModel> getOrdersByUserID(Long userId) {
+        try {
+            String sqlCommand = String.format("SELECT * from %s WHERE user_id = %d", TABLENAME, userId);
+            return jdbcTemplate.query(sqlCommand, (rs, rowNum) -> new OrderModel(rs));
+        } catch(NullPointerException exception) {
+            return new ArrayList<OrderModel>();
         }
     }
 }

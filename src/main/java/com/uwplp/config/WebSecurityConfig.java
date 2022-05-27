@@ -56,7 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/product_image/**/**").permitAll()
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/add_product","/product_image/upload").hasAuthority("VENDOR")
-                        .antMatchers("/buy").hasAnyAuthority("USER", "VENDOR")
+                        .antMatchers("/buy", "/orders").hasAnyAuthority("USER", "VENDOR")
                         .anyRequest().authenticated())
                 .addFilterBefore(new JWTAuthenticationFilter(userService, jWTTokenHelper),
                         UsernamePasswordAuthenticationFilter.class);
