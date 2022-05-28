@@ -76,4 +76,10 @@ public class UsersDAO {
             throw new RuntimeException("Пользователь с таким именем уже существует");
         }
     }
+
+    public void changeRole(Long userId, String role) {
+        String sqlCommand = String.format("UPDATE %s SET user_role = '%s' WHERE user_id = %d",
+                TABLENAME, role, userId);
+        jdbcTemplate.execute(sqlCommand);
+    }
 }

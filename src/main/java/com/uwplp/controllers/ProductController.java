@@ -5,7 +5,6 @@ import com.uwplp.components.DAO.UsersDAO;
 import com.uwplp.components.models.OrderModel;
 import com.uwplp.components.models.ProductModel;
 import com.uwplp.components.DAO.ProductsDAO;
-import com.uwplp.components.models.UserModel;
 import com.uwplp.ApplicationContext;
 import com.uwplp.services.CloudService;
 import org.slf4j.Logger;
@@ -17,17 +16,13 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.websocket.server.PathParam;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,11 +66,6 @@ public class ProductController {
         return new ResponseEntity(productsDAO.readByID(id), HttpStatus.OK);
     }
 
-    @GetMapping("/admin")
-    public ResponseEntity adminHello() {
-        return new ResponseEntity("hello admin", HttpStatus.OK);
-    }
-
     @GetMapping("/products/{id}/reviews")
     public ResponseEntity readReviewsByID(@PathVariable("id") Long id) {
         return ResponseEntity.ok()
@@ -89,19 +79,13 @@ public class ProductController {
         return productDAO.updateByID(id, name, 0L).toString();
     }*/
 
-    @GetMapping("/admin/users")
-    public ResponseEntity readAllUsers() {
-        List <UserModel> body = usersDAO.readAllUserData();
-        log.debug(body.toString());
-        return ResponseEntity.ok()
-                .body(body);
-    }
+
 
     @PostMapping("/add_product")
     public ResponseEntity addProduct(Principal user, @RequestBody ProductModel productModel) {
         log.debug("addProduct was called");
         productModel.setProduct_id(productsDAO.getNextId());
-        Long vendorId = usersDAO.getByUsername(user.getName()).getUserId();
+        Long vendorId = usersDAO.getByUsername(user.getName()).getUser_id();
         productModel.setVendor_id(vendorId);
         productsDAO.addProduct(productModel);
         return ResponseEntity.ok(productModel.getProduct_id());
@@ -127,7 +111,7 @@ public class ProductController {
     @PostMapping("/buy")
     public ResponseEntity buy(Principal user, @RequestBody List<OrderModel> orders) {
         productsDAO.subtract(orders);
-        Long userId = usersDAO.getByUsername(user.getName()).getUserId();
+        Long userId = usersDAO.getByUsername(user.getName()).getUser_id();
         orders = orders.stream().map((order) -> {
             order.setOrder_id(ordersDAO.getNextId());
             order.setUser_id(userId);

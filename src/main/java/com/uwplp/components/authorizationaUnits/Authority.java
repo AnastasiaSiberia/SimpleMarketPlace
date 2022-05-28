@@ -3,8 +3,6 @@ package com.uwplp.components.authorizationaUnits;
 import com.uwplp.components.models.UserModel;
 import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
-
 public class Authority implements GrantedAuthority {
 
 	private Long id;
@@ -14,8 +12,8 @@ public class Authority implements GrantedAuthority {
 	private String roleDescription;
 
 	public Authority(UserModel userModel) {
-		this.id = userModel.getUserId();
-		this.setRoleCode(userModel.getUserRole().toString());
+		this.id = userModel.getUser_id();
+		this.setRoleCode(userModel.getUser_role().toString());
 		this.setRoleDescription("");
 	}
 	

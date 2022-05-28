@@ -1,11 +1,8 @@
 package com.uwplp.controllers;
 
-import com.uwplp.ApplicationContext;
 import com.uwplp.components.DAO.OrdersDAO;
-import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.components.DAO.UsersDAO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +27,7 @@ public class OrderController {
 
     @GetMapping("/orders")
     public ResponseEntity getOrders(Principal user) {
-        Long user_id = usersDAO.getByUsername(user.getName()).getUserId();
+        Long user_id = usersDAO.getByUsername(user.getName()).getUser_id();
         return ResponseEntity.ok(ordersDAO.getOrdersByUserID(user_id));
     }
 }

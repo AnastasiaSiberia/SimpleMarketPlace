@@ -46,6 +46,11 @@ public class UwplpApplication{
                         .allowedMethods("GET", "POST")
                         .allowCredentials(true)
                         .maxAge(3600);
+                registry.addMapping("/admin/**")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST")
+                        .allowCredentials(true)
+                        .maxAge(3600);
             }
         };
     }

@@ -4,10 +4,8 @@ import com.uwplp.components.models.UserModel;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 public class User implements UserDetails {
@@ -19,7 +17,7 @@ public class User implements UserDetails {
 	private List<Authority> authorities;
 
 	public User(UserModel userModel) {
-		this.id = userModel.getUserId();
+		this.id = userModel.getUser_id();
 		this.userName = userModel.getUsername();
 		this.password = userModel.getPassword();
 		this.authorities = new ArrayList<>();
