@@ -1,11 +1,14 @@
 package com.uwplp.controllers;
 
 import com.uwplp.components.DAO.OrdersDAO;
+import com.uwplp.components.DAO.ProductReviewsDAO;
 import com.uwplp.components.DAO.UsersDAO;
 import com.uwplp.components.models.OrderModel;
 import com.uwplp.components.models.ProductModel;
 import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.ApplicationContext;
+import com.uwplp.components.models.ProductReviewModel;
+import com.uwplp.components.requests.AddViewRequest;
 import com.uwplp.services.CloudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,20 +34,17 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
-    private static ProductsDAO productsDAO;
-    private static UsersDAO usersDAO;
-    private static OrdersDAO ordersDAO;
+    @Autowired
+    private ProductsDAO productsDAO;
+    @Autowired
+    private UsersDAO usersDAO;
+    @Autowired
+    private OrdersDAO ordersDAO;
+    @Autowired
+    private ProductReviewsDAO productReviewsDAO;
 
     @Autowired
     private CloudService cloudService;
-
-    public ProductController() {
-        try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class)) {
-            productsDAO = (ProductsDAO)context.getBean("productsDAO");
-            usersDAO = (UsersDAO)context.getBean("usersDAO");
-            ordersDAO = (OrdersDAO)context.getBean("ordersDAO");
-        }
-    }
 
     @Deprecated
     @GetMapping("/products")
@@ -66,23 +66,29 @@ public class ProductController {
         return new ResponseEntity(productsDAO.readByID(id), HttpStatus.OK);
     }
 
-    @GetMapping("/products/{id}/reviews")
-    public ResponseEntity readReviewsByID(@PathVariable("id") Long id) {
-        return ResponseEntity.ok()
-                .body("nothing yet");
+    @PostMapping("/products/add_views")
+    public ResponseEntity<?> addViews(@RequestBody List <AddViewRequest> requests) {
+        requests.forEach(request -> productsDAO.addViews(request.getProductId(), request.getSize()));
+        return ResponseEntity.ok("views was added");
     }
 
-    /*@PostMapping("/products/{id}")
-    public String updateProductByID(@PathVariable("id") Long id,
-                             @RequestParam("name") String productName,
-                             @RequestParam(value = "views", defaultValue = "0") Long views) {
-        return productDAO.updateByID(id, name, 0L).toString();
-    }*/
+    @GetMapping("/products/{id}/reviews")
+    public ResponseEntity readReviewsByID(@PathVariable("id") Long id) {
+        List<ProductReviewModel> reviews = productReviewsDAO.getReviews(id);
+        return ResponseEntity.ok(reviews);
+    }
 
-
+    @PostMapping("/products/{id}/review")
+    public ResponseEntity<?> addProductReview(@PathVariable("id") Long productId, Principal user, @RequestBody ProductReviewModel model) {
+        model.setUser_id(usersDAO.getByUsername(user.getName()).getUser_id());
+        model.setProduct_id(productId);
+        productReviewsDAO.addProductReview(model);
+        productsDAO.addRating(productId, model.getReview_value());
+        return ResponseEntity.ok("The review was added");
+    }
 
     @PostMapping("/add_product")
-    public ResponseEntity addProduct(Principal user, @RequestBody ProductModel productModel) {
+    public ResponseEntity<?> addProduct(Principal user, @RequestBody ProductModel productModel) {
         log.debug("addProduct was called");
         productModel.setProduct_id(productsDAO.getNextId());
         Long vendorId = usersDAO.getByUsername(user.getName()).getUser_id();

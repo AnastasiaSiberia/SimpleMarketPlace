@@ -2,6 +2,7 @@ package com.uwplp.components.DAO;
 
 import com.uwplp.components.models.OrderModel;
 import com.uwplp.components.models.ProductModel;
+import com.uwplp.components.models.ProductReviewModel;
 import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class ProductsDAO{
     }
     public List<ProductModel> readAllProductInfo() {
         return new ArrayList<>(jdbcTemplate.query(
-                "SELECT product_id, product_name, product_nviews, product_rating, vendor_id, username FROM " + TABLENAME +
+                "SELECT product_id, product_name, product_nviews, product_rating, product_nreviews, vendor_id, username FROM " + TABLENAME +
                         " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id" ,
                 (res, rowNum) -> new ProductModel(res)
         ));
@@ -94,5 +95,22 @@ public class ProductsDAO{
             order.setOrder_time(new Date());
             changeQuantity(pm.getProduct_id(), pm.getProduct_quantity() - order.getOrder_size());
         });
+    }
+
+    public void addViews(Long productId, Long size) {
+        String sqlCommand = String.format("UPDATE %s " +
+                        "SET product_nviews = product_nviews + %d " +
+                        "WHERE product_id = %d",
+                TABLENAME, size, productId);
+        jdbcTemplate.execute(sqlCommand);
+    }
+
+    public void addRating(Long productId, Long reviewValue) {
+        String sqlCommand = String.format("UPDATE %s " +
+                        "SET product_rating = product_rating + %d, " +
+                        "product_nreviews = product_nreviews + 1 " +
+                        "WHERE product_id = %d",
+                TABLENAME, reviewValue, productId);
+        jdbcTemplate.execute(sqlCommand);
     }
 }
