@@ -13,6 +13,7 @@ public class UserModel {
     private Long user_id;
     private String username;
     private String password;
+    private String user_email;
     private Roles user_role;
 
     public UserModel() {}
@@ -27,6 +28,8 @@ public class UserModel {
             this.password = rs.getString("password");
         if(checker.hasColumn("user_role"))
             this.user_role = Roles.valueOf(rs.getString("user_role"));
+        if(checker.hasColumn("user_email"))
+            this.user_email = rs.getString("user_email");
     }
 
     public enum Roles {
@@ -85,5 +88,13 @@ public class UserModel {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUser_email() {
+        return user_email;
+    }
+
+    public void setUser_email(String user_email) {
+        this.user_email = user_email;
     }
 }

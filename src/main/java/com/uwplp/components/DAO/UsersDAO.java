@@ -47,7 +47,7 @@ public class UsersDAO {
 
     public List<UserModel> readAllUserData() {
         return new ArrayList<>(jdbcTemplate.query(
-                "SELECT user_id, username, user_role FROM " + TABLENAME,
+                "SELECT user_id, username, user_role, user_email FROM " + TABLENAME,
                 (res, rowNum) -> new UserModel(res)
         ));
     }
@@ -63,18 +63,15 @@ public class UsersDAO {
     public void addUser(RegistrationRequest request) {
         Long userId = getNextUserId();
         String encodedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
-        String sqlCommand = String.format("INSERT INTO %s VALUES(%d, '%s', '%s', '%s')",
+        String sqlCommand = String.format("INSERT INTO %s VALUES(%d, '%s', '%s', '%s', '%s')",
                 TABLENAME,
                 userId,
                 request.getUsername(),
                 "USER",
-                encodedPassword
+                encodedPassword,
+                request.getEmail()
                 );
-        try {
-            jdbcTemplate.execute(sqlCommand);
-        } catch (Exception ex) {
-            throw new RuntimeException("Пользователь с таким именем уже существует");
-        }
+        jdbcTemplate.execute(sqlCommand);
     }
 
     public void changeRole(Long userId, String role) {

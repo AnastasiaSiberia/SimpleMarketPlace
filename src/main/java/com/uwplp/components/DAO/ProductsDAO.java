@@ -33,7 +33,8 @@ public class ProductsDAO{
     }
     public List<ProductModel> readAllProductInfo() {
         return new ArrayList<>(jdbcTemplate.query(
-                "SELECT product_id, product_name, product_nviews, product_rating, product_nreviews, vendor_id, username FROM " + TABLENAME +
+                "SELECT product_id, product_name, product_nviews, product_description, " +
+                        "product_rating, product_nreviews, vendor_id, username, product_price FROM " + TABLENAME +
                         " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id" ,
                 (res, rowNum) -> new ProductModel(res)
         ));
@@ -60,12 +61,14 @@ public class ProductsDAO{
     }
     public void addProduct(ProductModel productModel) {
         String command = String.format(
-                "INSERT INTO %s(product_id, product_name, product_description, vendor_id)  values(%d, '%s', '%s', %d)",
+                "INSERT INTO %s(product_id, product_name, product_description, vendor_id, product_price, product_quantity)  values(%d, '%s', '%s', %d, %d, %d)",
                 TABLENAME,
                 productModel.getProduct_id(),
                 productModel.getProduct_name(),
                 productModel.getProduct_description(),
-                productModel.getVendor_id()
+                productModel.getVendor_id(),
+                productModel.getProduct_price(),
+                productModel.getProduct_quantity()
         );
         jdbcTemplate.execute(command);
     }
