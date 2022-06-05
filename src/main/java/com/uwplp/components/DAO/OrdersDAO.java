@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +18,15 @@ import java.util.Map;
 public class OrdersDAO {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final Logger log = LoggerFactory.getLogger(OrdersDAO.class);
     public static final String TABLENAME = "orders";
+    public static final String SEQUENCE_NAME = "order_sequence";
+    private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
     public OrdersDAO (DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     public void addOrders(List<OrderModel> orders) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/YYYY");
         orders.forEach(order -> {
             String command = String.format(
                     "INSERT INTO %s  values(%d, %d, %d, %d, %d, TO_DATE('%s', 'dd/MM/YYYY'))",
@@ -42,20 +43,16 @@ public class OrdersDAO {
     }
 
     public Long getNextId() {
-        try {
-            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(order_id) from " + TABLENAME);
-            return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
-        } catch(NullPointerException exception) {
-            return 0L;
-        }
+        String sqlCommand = String.format("SELECT nextval('%s')", SEQUENCE_NAME);
+        return jdbcTemplate.query(sqlCommand, (rs, rowNum) -> rs.getLong("nextval")).get(0);
     }
 
-    public List<OrderModel> getOrdersByUserID(Long userId) {
+    public List<OrderModel> getOrdersByUserID(long userId) {
         try {
             String sqlCommand = String.format("SELECT * from %s WHERE user_id = %d", TABLENAME, userId);
             return jdbcTemplate.query(sqlCommand, (rs, rowNum) -> new OrderModel(rs));
         } catch(NullPointerException exception) {
-            return new ArrayList<OrderModel>();
+            return new ArrayList<>();
         }
     }
 }
