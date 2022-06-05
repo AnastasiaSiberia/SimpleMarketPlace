@@ -61,6 +61,11 @@ public class UwplpApplication{
                         .allowedMethods("GET", "POST")
                         .allowCredentials(true)
                         .maxAge(3600);
+                registry.addMapping("/products/**/disable")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST")
+                        .allowCredentials(true)
+                        .maxAge(3600);
                 registry.addMapping("/products/**/reviews")
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST")

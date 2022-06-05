@@ -8,6 +8,7 @@ import com.uwplp.components.models.ProductModel;
 import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.ApplicationContext;
 import com.uwplp.components.models.ProductReviewModel;
+import com.uwplp.components.models.UserModel;
 import com.uwplp.components.requests.AddViewRequest;
 import com.uwplp.services.CloudService;
 import org.slf4j.Logger;
@@ -45,13 +46,6 @@ public class ProductController {
 
     @Autowired
     private CloudService cloudService;
-
-    @Deprecated
-    @GetMapping("/products")
-    public String readAllProducts() {
-        log.info("the command \"readAll\" was gotten");
-        return productsDAO.readAll().toString();
-    }
 
     @GetMapping("/product_info")
     public ResponseEntity readAllProductInfo() {
@@ -125,5 +119,16 @@ public class ProductController {
         }).collect(Collectors.toList());
         ordersDAO.addOrders(orders);
         return ResponseEntity.ok("The order was added");
+    }
+
+    @GetMapping("/products/{id}/disable")
+    public ResponseEntity disableProduct(Principal user, @PathVariable("id") Long productId) {
+        if(usersDAO.getByUsername(user.getName()).getUser_role().equals(UserModel.Roles.ADMIN)||
+                user.getName().equals(productsDAO.readByID(productId).getVendor_name())) {
+            productsDAO.disableProduct(productId);
+            return ResponseEntity.ok("The product was disabled");
+        }
+        else
+            return ResponseEntity.badRequest().body("You don't have rights for this product");
     }
 }

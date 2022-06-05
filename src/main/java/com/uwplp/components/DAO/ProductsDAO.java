@@ -23,19 +23,12 @@ public class ProductsDAO{
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public JSONArray readAll() {
-        List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT * FROM " + TABLENAME,
-                (res, rowNum) -> new ProductModel(res)
-        ));
-        log.debug("the response for readAll was created");
-        return new JSONArray(response);
-    }
     public List<ProductModel> readAllProductInfo() {
         return new ArrayList<>(jdbcTemplate.query(
                 "SELECT product_id, product_name, product_nviews, product_description, " +
                         "product_rating, product_nreviews, vendor_id, username, product_price FROM " + TABLENAME +
-                        " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id" ,
+                        " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id " +
+                        "WHERE product_enable=1 AND product_quantity > 0" ,
                 (res, rowNum) -> new ProductModel(res)
         ));
     }
@@ -72,17 +65,11 @@ public class ProductsDAO{
         );
         jdbcTemplate.execute(command);
     }
-    /*@Override
-    public JSONArray updateByID(Long productId, ProductModel newModel) {
-        jdbcTemplate.update("UPDATE ? SET product_name = ?, product_views = ?, product_reviews = ?, " +
-                "product_rating = ?, product_imagename = ? WHERE product_id = ?", tableName,
-                newModel.getProduct_name(), newModel.getProduct_nviews(), newModel.getProduct_nreviews(),
-                newModel.getProduct_rating(), newModel.getProduct_imagename(), newModel.getProduct_id());
-        return new JSONArray(ResponseEntity.ok());
-    }*/
-    public JSONArray deleteAll() {
-        jdbcTemplate.update("DELETE FROM " + TABLENAME);
-        return new JSONArray("[200, OK]");
+
+    public void disableProduct(Long productId) {
+        String sqlCommand = String.format("UPDATE %s SET product_enable = 0 WHERE product_id = %d",
+                TABLENAME, productId);
+        jdbcTemplate.execute(sqlCommand);
     }
 
     void changeQuantity(Long productId, Long productQuantity) {

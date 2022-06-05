@@ -19,6 +19,7 @@ public class OrderModel {
     private Long order_size;
     private Date order_time;
 
+    public OrderModel() {}
     public OrderModel(ResultSet rs) throws SQLException {
         ResultSetColumnChecker checker = new ResultSetColumnChecker(rs);
         if(checker.hasColumn("order_id"))
