@@ -76,7 +76,11 @@ public class ProductController {
     public ResponseEntity<?> addProductReview(@PathVariable("id") Long productId, Principal user, @RequestBody ProductReviewModel model) {
         model.setUser_id(usersDAO.getByUsername(user.getName()).getUser_id());
         model.setProduct_id(productId);
-        productReviewsDAO.addProductReview(model);
+        try {
+            productReviewsDAO.addProductReview(model);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
         productsDAO.addRating(productId, model.getReview_value());
         return ResponseEntity.ok("The review was added");
     }

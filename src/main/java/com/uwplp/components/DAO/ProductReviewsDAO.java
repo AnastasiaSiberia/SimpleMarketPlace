@@ -1,30 +1,26 @@
 package com.uwplp.components.DAO;
 
 import com.uwplp.components.models.ProductReviewModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ProductReviewsDAO {
-    private final JdbcTemplate jdbcTemplate;
-    private static final Logger log = LoggerFactory.getLogger(ProductsDAO.class);
-    public static final String TABLENAME = "product_reviews";
-
+public class ProductReviewsDAO extends DAO{
     public ProductReviewsDAO (DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+        super(dataSource, "product_reviews", "product_reviews_sequence");
     }
-
 
     public List<ProductReviewModel> getReviews(Long id) {
         String sqlCommand = String.format("SELECT %s.*, username FROM %s " +
                 "left join %s on %s.user_id = %s.user_id " +
-                "WHERE product_id = %d ", TABLENAME, TABLENAME, UsersDAO.TABLENAME,
-                TABLENAME, UsersDAO.TABLENAME, id);
+                "WHERE product_id = %d ",
+                TABLE_NAME,
+                TABLE_NAME,
+                UsersDAO.TABLENAME,
+                TABLE_NAME,
+                UsersDAO.TABLENAME,
+                id);
         try {
             return jdbcTemplate.query(sqlCommand, (rs, rowNum) -> new ProductReviewModel(rs));
         } catch (NullPointerException ex) {
@@ -33,23 +29,17 @@ public class ProductReviewsDAO {
     }
 
     public void addProductReview(ProductReviewModel model) {
-        model.setProduct_review_id(getNextProductReviewId());
+        if(model.getReview_value() < 0 || model.getReview_value() > 5) {
+            throw new IllegalArgumentException("A review value must be between 0 and 5");
+        }
+        model.setProduct_review_id(getNextId());
         String sqlCommand = String.format("INSERT INTO %s VALUES(%d, %d, %d, '%s', %d)",
-                TABLENAME,
+                TABLE_NAME,
                 model.getProduct_review_id(),
                 model.getProduct_id(),
                 model.getReview_value(),
                 model.getReview_text(),
                 model.getUser_id());
         jdbcTemplate.update(sqlCommand);
-    }
-
-    private Long getNextProductReviewId() {
-        try {
-            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_review_id) from " + TABLENAME);
-            return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
-        } catch(NullPointerException exception) {
-            return 0L;
-        }
     }
 }
