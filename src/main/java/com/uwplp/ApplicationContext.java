@@ -18,16 +18,6 @@ import javax.sql.DataSource;
 @ComponentScan("com.uwplp.components")
 public class ApplicationContext {
     private static final Logger log = LoggerFactory.getLogger(ApplicationContext.class);
-
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurerAdapter() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**").allowedOrigins("http://localhost:3000");
-//            }
-//        };
-//    }
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -44,9 +34,7 @@ public class ApplicationContext {
     }
 
     @Bean
-    public UsersDAO usersDAO() {
-        return new UsersDAO(dataSource());
-    }
+    public UsersDAO usersDAO() {return new UsersDAO(dataSource());}
 
     @Bean
     public OrdersDAO ordersDAO() {

@@ -48,16 +48,8 @@ public class UsersDAO extends DAO{
         ));
     }
 
-    public Long getNextUserId() {
-        try {
-            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(user_id) from " + TABLE_NAME);
-            return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
-        } catch(NullPointerException exception) {
-            return 0L;
-        }
-    }
     public void addUser(RegistrationRequest request) {
-        Long userId = getNextUserId();
+        Long userId = getNextId();
         String encodedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
         String sqlCommand = String.format("INSERT INTO %s VALUES(%d, '%s', '%s', '%s', '%s')",
                 TABLE_NAME,

@@ -38,15 +38,6 @@ public class ProductsDAO extends DAO{
         log.debug("the response for readByID was created");
         return response.get(0);
     }
-
-    public Long getNextId() {
-        try {
-            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLE_NAME);
-            return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
-        } catch(NullPointerException exception) {
-            return 0L;
-        }
-    }
     public void addProduct(ProductModel productModel) {
         String command = String.format(
                 "INSERT INTO %s(product_id, product_name, product_description, vendor_id, product_price, product_quantity)  values(%d, '%s', '%s', %d, %d, %d)",
