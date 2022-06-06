@@ -4,12 +4,14 @@ import com.uwplp.components.models.OrderModel;
 import com.uwplp.components.models.ProductModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.parameters.P;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ProductsDAO extends DAO{
     private static final Logger log = LoggerFactory.getLogger(ProductsDAO.class);
@@ -65,6 +67,28 @@ public class ProductsDAO extends DAO{
     }
 
     public void subtract(List<OrderModel> orders) {
+        subtractOrders(orders);
+        if(!validatePositiveQuantity()) {
+            subtractOrders(orders.stream()
+                    .peek(order -> order.setOrder_size(-order.getOrder_size()))
+                    .collect(Collectors.toList()));
+        }
+        else {
+            throw new IllegalArgumentException("Some products are not enough");
+        }
+    }
+
+    private boolean validatePositiveQuantity() {
+        try {
+            String sqlCommand = String.format("SELECT product_id FROM %s WHERE product_quantity < 0", TABLE_NAME);
+            jdbcTemplate.query(sqlCommand, (rs, rowNum) -> rs.getLong("product_id"));
+            return false;
+        } catch (NullPointerException ex) {
+            return true;
+        }
+    }
+
+    private void subtractOrders(List<OrderModel> orders) {
         orders.forEach((order) -> {
             ProductModel pm = readByID(order.getProduct_id());
             order.setOrder_price(pm.getProduct_price());

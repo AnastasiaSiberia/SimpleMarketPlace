@@ -113,7 +113,11 @@ public class ProductController {
 
     @PostMapping("/buy")
     public ResponseEntity<String> buy(Principal user, @RequestBody List<OrderModel> orders) {
-        productsDAO.subtract(orders);
+        try {
+            productsDAO.subtract(orders);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
         Long userId = usersDAO.getByUsername(user.getName()).getUser_id();
         orders = orders.stream().peek((order) -> {
             order.setOrder_id(ordersDAO.getNextId());
