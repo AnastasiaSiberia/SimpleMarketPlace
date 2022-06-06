@@ -2,15 +2,12 @@ package com.uwplp.components.DAO;
 
 import com.uwplp.components.models.OrderModel;
 import com.uwplp.components.models.ProductModel;
-import com.uwplp.components.models.ProductReviewModel;
-import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +22,7 @@ public class ProductsDAO extends DAO{
         return new ArrayList<>(jdbcTemplate.query(
                 "SELECT product_id, product_name, product_nviews, product_description, " +
                         "product_rating, product_nreviews, vendor_id, username, product_price FROM " + TABLE_NAME +
-                        " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id " +
+                        " left join " + UsersDAO.TABLE_NAME + " on vendor_id = user_id " +
                         "WHERE product_enable=1 AND product_quantity > 0" ,
                 (res, rowNum) -> new ProductModel(res)
         ));
@@ -34,7 +31,7 @@ public class ProductsDAO extends DAO{
     public ProductModel readByID(Long productId) {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
                 "SELECT products.*, vendor_id, username FROM " + TABLE_NAME +
-                        " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id " + " WHERE product_id = ?",
+                        " left join " + UsersDAO.TABLE_NAME + " on vendor_id = user_id " + " WHERE product_id = ?",
                 new Object[]{productId},
                 (res, rowNum) -> new ProductModel(res)
         ));

@@ -1,10 +1,10 @@
 package com.uwplp.components.DAO;
 
 import com.uwplp.components.models.ProductReviewModel;
+
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ProductReviewsDAO extends DAO{
     public ProductReviewsDAO (DataSource dataSource) {
@@ -17,9 +17,9 @@ public class ProductReviewsDAO extends DAO{
                 "WHERE product_id = %d ",
                 TABLE_NAME,
                 TABLE_NAME,
-                UsersDAO.TABLENAME,
+                UsersDAO.TABLE_NAME,
                 TABLE_NAME,
-                UsersDAO.TABLENAME,
+                UsersDAO.TABLE_NAME,
                 id);
         try {
             return jdbcTemplate.query(sqlCommand, (rs, rowNum) -> new ProductReviewModel(rs));

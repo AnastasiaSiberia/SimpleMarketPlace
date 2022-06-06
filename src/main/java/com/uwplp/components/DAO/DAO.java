@@ -6,7 +6,7 @@ import javax.sql.DataSource;
 
 public abstract class DAO {
     protected JdbcTemplate jdbcTemplate;
-    protected final String TABLE_NAME;
+    public final String TABLE_NAME;
     protected final String SEQUENCE_NAME;
 
     public DAO (DataSource dataSource, String TABLE_NAME, String SEQUENCE_NAME) {
@@ -19,5 +19,4 @@ public abstract class DAO {
         String sqlCommand = String.format("SELECT nextval('%s')", SEQUENCE_NAME);
         return jdbcTemplate.query(sqlCommand, (rs, rowNum) -> rs.getLong("nextval")).get(0);
     }
-
 }
