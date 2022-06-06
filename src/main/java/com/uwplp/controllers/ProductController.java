@@ -43,12 +43,11 @@ public class ProductController {
     private OrdersDAO ordersDAO;
     @Autowired
     private ProductReviewsDAO productReviewsDAO;
-
     @Autowired
     private CloudService cloudService;
 
     @GetMapping("/product_info")
-    public ResponseEntity readAllProductInfo() {
+    public ResponseEntity<?> readAllProductInfo() {
         log.info("the command \"readAll\" was gotten");
         List<ProductModel> body = productsDAO.readAllProductInfo();
         return ResponseEntity.ok()
@@ -56,8 +55,8 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public ResponseEntity readByID(@PathVariable("id") Long id) {
-        return new ResponseEntity(productsDAO.readByID(id), HttpStatus.OK);
+    public ResponseEntity<ProductModel> readByID(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(productsDAO.readByID(id));
     }
 
     @PostMapping("/products/add_views")
@@ -67,7 +66,7 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}/reviews")
-    public ResponseEntity readReviewsByID(@PathVariable("id") Long id) {
+    public ResponseEntity<?> readReviewsByID(@PathVariable("id") Long id) {
         List<ProductReviewModel> reviews = productReviewsDAO.getReviews(id);
         return ResponseEntity.ok(reviews);
     }
@@ -95,15 +94,15 @@ public class ProductController {
         return ResponseEntity.ok(productModel.getProduct_id());
     }
     @PostMapping("/product_image/upload/{product_id}")
-    public ResponseEntity loadFile(Principal user,
+    public ResponseEntity<String> uploadFile(Principal user,
                                    @PathVariable String product_id,
                                    @RequestBody MultipartFile file) throws IOException {
         cloudService.saveFile(user.getName(), product_id, file);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok("The file was uploaded");
     }
 
     @GetMapping("/product_image/{vendor_name}/{product_id}")
-    public ResponseEntity getFile(@PathVariable String vendor_name, @PathVariable String product_id) throws FileNotFoundException {
+    public ResponseEntity<?> getFile(@PathVariable String vendor_name, @PathVariable String product_id) throws FileNotFoundException {
         File file = cloudService.getFile(vendor_name, product_id);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         return ResponseEntity.ok()
@@ -113,20 +112,19 @@ public class ProductController {
     }
 
     @PostMapping("/buy")
-    public ResponseEntity buy(Principal user, @RequestBody List<OrderModel> orders) {
+    public ResponseEntity<String> buy(Principal user, @RequestBody List<OrderModel> orders) {
         productsDAO.subtract(orders);
         Long userId = usersDAO.getByUsername(user.getName()).getUser_id();
-        orders = orders.stream().map((order) -> {
+        orders = orders.stream().peek((order) -> {
             order.setOrder_id(ordersDAO.getNextId());
             order.setUser_id(userId);
-            return order;
         }).collect(Collectors.toList());
         ordersDAO.addOrders(orders);
         return ResponseEntity.ok("The order was added");
     }
 
     @GetMapping("/products/{id}/disable")
-    public ResponseEntity disableProduct(Principal user, @PathVariable("id") Long productId) {
+    public ResponseEntity<String> disableProduct(Principal user, @PathVariable("id") Long productId) {
         if(usersDAO.getByUsername(user.getName()).getUser_role().equals(UserModel.Roles.ADMIN)||
                 user.getName().equals(productsDAO.readByID(productId).getVendor_name())) {
             productsDAO.disableProduct(productId);

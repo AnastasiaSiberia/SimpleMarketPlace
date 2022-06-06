@@ -14,19 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ProductsDAO{
-    private final JdbcTemplate jdbcTemplate;
+public class ProductsDAO extends DAO{
     private static final Logger log = LoggerFactory.getLogger(ProductsDAO.class);
-    public static final String TABLENAME = "products";
 
     public ProductsDAO (DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+        super(dataSource, "products", "product_sequence");
     }
 
     public List<ProductModel> readAllProductInfo() {
         return new ArrayList<>(jdbcTemplate.query(
                 "SELECT product_id, product_name, product_nviews, product_description, " +
-                        "product_rating, product_nreviews, vendor_id, username, product_price FROM " + TABLENAME +
+                        "product_rating, product_nreviews, vendor_id, username, product_price FROM " + TABLE_NAME +
                         " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id " +
                         "WHERE product_enable=1 AND product_quantity > 0" ,
                 (res, rowNum) -> new ProductModel(res)
@@ -35,7 +33,7 @@ public class ProductsDAO{
 
     public ProductModel readByID(Long productId) {
         List<ProductModel> response = new ArrayList<>(jdbcTemplate.query(
-                "SELECT products.*, vendor_id, username FROM " + TABLENAME +
+                "SELECT products.*, vendor_id, username FROM " + TABLE_NAME +
                         " left join " + UsersDAO.TABLENAME + " on vendor_id = user_id " + " WHERE product_id = ?",
                 new Object[]{productId},
                 (res, rowNum) -> new ProductModel(res)
@@ -46,7 +44,7 @@ public class ProductsDAO{
 
     public Long getNextId() {
         try {
-            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLENAME);
+            List<Map<String, Object>> maxIds = jdbcTemplate.queryForList("SELECT max(product_id) from " + TABLE_NAME);
             return Long.parseLong(maxIds.get(0).get("max").toString()) + 1;
         } catch(NullPointerException exception) {
             return 0L;
@@ -55,7 +53,7 @@ public class ProductsDAO{
     public void addProduct(ProductModel productModel) {
         String command = String.format(
                 "INSERT INTO %s(product_id, product_name, product_description, vendor_id, product_price, product_quantity)  values(%d, '%s', '%s', %d, %d, %d)",
-                TABLENAME,
+                TABLE_NAME,
                 productModel.getProduct_id(),
                 productModel.getProduct_name(),
                 productModel.getProduct_description(),
@@ -68,13 +66,13 @@ public class ProductsDAO{
 
     public void disableProduct(Long productId) {
         String sqlCommand = String.format("UPDATE %s SET product_enable = 0 WHERE product_id = %d",
-                TABLENAME, productId);
+                TABLE_NAME, productId);
         jdbcTemplate.execute(sqlCommand);
     }
 
     void changeQuantity(Long productId, Long productQuantity) {
         String command = String.format("UPDATE %s SET product_quantity = %d WHERE product_id = %d",
-                TABLENAME, productQuantity, productId);
+                TABLE_NAME, productQuantity, productId);
         jdbcTemplate.update(command);
     }
 
@@ -91,7 +89,7 @@ public class ProductsDAO{
         String sqlCommand = String.format("UPDATE %s " +
                         "SET product_nviews = product_nviews + %d " +
                         "WHERE product_id = %d",
-                TABLENAME, size, productId);
+                TABLE_NAME, size, productId);
         jdbcTemplate.execute(sqlCommand);
     }
 
@@ -100,7 +98,7 @@ public class ProductsDAO{
                         "SET product_rating = product_rating + %d, " +
                         "product_nreviews = product_nreviews + 1 " +
                         "WHERE product_id = %d",
-                TABLENAME, reviewValue, productId);
+                TABLE_NAME, reviewValue, productId);
         jdbcTemplate.execute(sqlCommand);
     }
 }
