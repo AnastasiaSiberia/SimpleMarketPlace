@@ -26,8 +26,6 @@ import java.security.spec.InvalidKeySpecException;
 @RequestMapping("/api/v1")
 @CrossOrigin
 public class AuthenticationController {
-
-    private static Logger log = LoggerFactory.getLogger(AuthenticationController.class);
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -68,7 +66,11 @@ public class AuthenticationController {
 
     @PostMapping("/auth/registration")
     public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
-        usersDAO.addUser(request);
-        return ResponseEntity.ok("user was added");
+        try {
+            usersDAO.addUser(request);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+        return ResponseEntity.ok("The user was added");
     }
 }

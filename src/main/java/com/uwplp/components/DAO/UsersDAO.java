@@ -14,6 +14,7 @@ import java.util.Map;
 public class UsersDAO extends DAO{
 
     public Logger log = LoggerFactory.getLogger(UsersDAO.class);
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     public static String TABLE_NAME = "users";
 
     public UsersDAO(DataSource dataSource) {
@@ -48,9 +49,11 @@ public class UsersDAO extends DAO{
         ));
     }
 
+
     public void addUser(RegistrationRequest request) {
+        validate(request);
         Long userId = getNextId();
-        String encodedPassword = new BCryptPasswordEncoder().encode(request.getPassword());
+        String encodedPassword = encoder.encode(request.getPassword());
         String sqlCommand = String.format("INSERT INTO %s VALUES(%d, '%s', '%s', '%s', '%s')",
                 TABLE_NAME,
                 userId,
@@ -60,6 +63,19 @@ public class UsersDAO extends DAO{
                 request.getEmail()
                 );
         jdbcTemplate.execute(sqlCommand);
+    }
+
+    private void validate(RegistrationRequest request) {
+        if(request.getUsername().length() < 3) {
+            throw new IllegalArgumentException("Имя пользователя должно быть длиннее 3 букв");
+        }
+        if(request.getPassword().length() < 3) {
+            throw new IllegalArgumentException("Пароль пользователя должен быть длиннее 3 букв");
+        }
+        try {
+            getByUsername(request.getUsername());
+            throw new IllegalArgumentException("Такой никнейм уже существует");
+        } catch (NullPointerException ignored) {}
     }
 
     public void changeRole(Long userId, String role) {

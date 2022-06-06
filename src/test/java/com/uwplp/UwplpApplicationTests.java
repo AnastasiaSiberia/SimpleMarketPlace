@@ -6,22 +6,18 @@ import com.uwplp.components.DAO.ProductsDAO;
 import com.uwplp.components.DAO.UsersDAO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.sql.DataSource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @ExtendWith(SpringExtension.class)
 class UwplpApplicationTests {
-    private AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class);
-    private ProductsDAO productsDAO = (ProductsDAO) context.getBean("productsDAO");
-    private ProductReviewsDAO productReviewsDAO = (ProductReviewsDAO) context.getBean("productReviewsDAO");
-    private OrdersDAO ordersDAO = (OrdersDAO) context.getBean("ordersDAO");
-    private UsersDAO usersDAO = (UsersDAO) context.getBean("usersDAO");
+    private final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationContext.class);
+    private final ProductsDAO productsDAO = (ProductsDAO) context.getBean("productsDAO");
+    private final ProductReviewsDAO productReviewsDAO = (ProductReviewsDAO) context.getBean("productReviewsDAO");
+    private final OrdersDAO ordersDAO = (OrdersDAO) context.getBean("ordersDAO");
+    private final UsersDAO usersDAO = (UsersDAO) context.getBean("usersDAO");
 
     @Nested
     class ContextLoads {
@@ -70,7 +66,7 @@ class UwplpApplicationTests {
         }
         @Test
         public void readAllUserData() {
-            Assertions.assertDoesNotThrow(() -> usersDAO.readAllUserData());
+            Assertions.assertDoesNotThrow(usersDAO::readAllUserData);
         }
         @Test
         public void getReviews() {
