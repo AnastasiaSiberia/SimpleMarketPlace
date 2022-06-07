@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -39,19 +40,14 @@ public class AuthenticationController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest) throws InvalidKeySpecException, NoSuchAlgorithmException {
-
+        String password = decodeBase64(authenticationRequest.getPassword());
         final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(), authenticationRequest.getPassword()));
-
+                authenticationRequest.getUsername(), password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         User user=(User)authentication.getPrincipal();
         String jwtToken=jWTTokenHelper.generateToken(user.getUsername());
-
         LoginResponse response=new LoginResponse();
         response.setToken(jwtToken);
-
-
         return ResponseEntity.ok(response);
     }
 
@@ -66,11 +62,21 @@ public class AuthenticationController {
 
     @PostMapping("/auth/registration")
     public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
+        request.setPassword(decodeBase64(request.getPassword()));
         try {
             usersDAO.addUser(request);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
         return ResponseEntity.ok("The user was added");
+    }
+
+    @PostMapping("/auth/authorize2")
+    public ResponseEntity <String> authorize2(@RequestBody AuthenticationRequest request) {
+        return ResponseEntity.ok(decodeBase64(request.getPassword()));
+    }
+
+    private String decodeBase64(String password) {
+        return new String(Base64.getDecoder().decode(password));
     }
 }

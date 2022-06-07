@@ -57,7 +57,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 "/products/**",
                                 "/product_image/**/**",
                                 "/products/add_views",
-                                "/products/**/reviews").permitAll()
+                                "/products/**/reviews",
+                                "/api/v1/auth/authorize2").permitAll()
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/add_product",
                                 "/product_image/upload",
